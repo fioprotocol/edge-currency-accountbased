@@ -19,7 +19,9 @@ export const BROADCAST_ACTIONS = {
   transferTokens: true,
   addPublicAddresses: true,
   transferFioAddress: true,
-  transferFioDomain: true
+  transferFioDomain: true,
+  stakeFioTokens: true,
+  unStakeFioTokens: true
 }
 
 export const ACTIONS_TO_END_POINT_KEYS = {
@@ -34,7 +36,9 @@ export const ACTIONS_TO_END_POINT_KEYS = {
   transferTokens: 'transferTokens',
   pushTransaction: 'pushTransaction',
   transferFioAddress: 'transferFioAddress',
-  transferFioDomain: 'transferFioDomain'
+  transferFioDomain: 'transferFioDomain',
+  stakeFioTokens: 'pushTransaction',
+  unStakeFioTokens: 'pushTransaction'
 }
 
 export const ACTIONS = {
@@ -45,7 +49,9 @@ export const ACTIONS = {
   requestFunds: 'requestFunds',
   recordObtData: 'recordObtData',
   transferFioAddress: 'transferFioAddress',
-  transferFioDomain: 'transferFioDomain'
+  transferFioDomain: 'transferFioDomain',
+  stakeFioTokens: 'stakeFioTokens',
+  unStakeFioTokens: 'unStakeFioTokens'
 }
 
 export const FIO_REQUESTS_TYPES = {
@@ -68,6 +74,12 @@ export const FEE_ACTION_MAP = {
   },
   [ACTIONS.recordObtData]: {
     propName: 'payerFioAddress'
+  },
+  stakeFioTokens: {
+    propName: 'fioAddress'
+  },
+  unStakeFioTokens: {
+    propName: 'fioAddress'
   }
 }
 
@@ -112,5 +124,6 @@ export type TxOtherParams = {
   meta: {
     isTransferProcessed?: boolean,
     isFeeProcessed?: boolean
-  }
+  },
+  ui?: any
 }

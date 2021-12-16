@@ -219,7 +219,7 @@ export class FioEngine extends CurrencyEngine {
         fioAddress: string = ''
       ): Promise<number> => {
         const { fee } = await this.multicastServers('getFee', {
-          endPoint: EndPoint[ACTIONS_TO_END_POINT_KEYS[actionName]],
+          endPoint: EndPoint[ACTIONS_TO_END_POINT_KEYS[actionName]], // todo: fix for stake/unstake/requestFunds
           fioAddress
         })
         return fee
@@ -1175,6 +1175,27 @@ export class FioEngine extends CurrencyEngine {
       [ACTIONS.transferFioAddress, ACTIONS.transferFioDomain].indexOf(name) > -1
     ) {
       params.newOwnerKey = publicAddress // todo: move this to the gui
+    }
+
+    if (name === ACTIONS.stakeFioTokens) {
+      params.amount = quantity
+    }
+
+    if (name === ACTIONS.unStakeFioTokens) {
+      params.amount = quantity
+      const stakedBalance =
+        this.walletLocalData.totalBalances[
+          this.currencyInfo.defaultSettings.balanceCurrencyCodes.staked
+        ]
+      otherParams.ui = {
+        accrued: bns.mul(
+          bns.mul(
+            bns.div(bns.sub(stakedBalance, quantity), stakedBalance),
+            `${this.otherData.srps}`
+          ),
+          this.otherData.stakingRoe
+        )
+      }
     }
 
     const edgeTransaction: EdgeTransaction = {
