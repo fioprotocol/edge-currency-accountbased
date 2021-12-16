@@ -37,9 +37,38 @@ export const ACTIONS_TO_END_POINT_KEYS = {
   transferFioDomain: 'transferFioDomain'
 }
 
+export const ACTIONS = {
+  transferTokens: 'transferTokens',
+  addPublicAddress: 'addPublicAddress',
+  addPublicAddresses: 'addPublicAddresses',
+  rejectFundsRequest: 'rejectFundsRequest',
+  requestFunds: 'requestFunds',
+  recordObtData: 'recordObtData',
+  transferFioAddress: 'transferFioAddress',
+  transferFioDomain: 'transferFioDomain'
+}
+
 export const FIO_REQUESTS_TYPES = {
   PENDING: 'PENDING',
   SENT: 'SENT'
+}
+
+export const FEE_ACTION_MAP = {
+  [ACTIONS.addPublicAddress]: {
+    propName: 'fioAddress'
+  },
+  [ACTIONS.addPublicAddresses]: {
+    propName: 'fioAddress'
+  },
+  [ACTIONS.rejectFundsRequest]: {
+    propName: 'payerFioAddress'
+  },
+  [ACTIONS.requestFunds]: {
+    propName: 'payeeFioAddress'
+  },
+  [ACTIONS.recordObtData]: {
+    propName: 'payerFioAddress'
+  }
 }
 
 export type FioRequest = {
@@ -64,4 +93,24 @@ export type FioDomain = {
   name: string,
   expiration: string,
   isPublic: boolean
+}
+
+export type TxOtherParams = {
+  account: string,
+  name: string,
+  authorization: Array<{ actor: string, permission: string }>,
+  data?: {
+    amount?: number,
+    max_fee?: number,
+    tpid?: string,
+    actor?: string
+  } & any,
+  action?: {
+    name: string,
+    params: any
+  },
+  meta: {
+    isTransferProcessed?: boolean,
+    isFeeProcessed?: boolean
+  }
 }
