@@ -82,7 +82,9 @@ export class FioEngine extends CurrencyEngine {
       PENDING: FioRequest[],
       SENT: FioRequest[]
     },
-    fioRequestsToApprove: { [requestId: string]: any }
+    fioRequestsToApprove: { [requestId: string]: any },
+    srps: 0,
+    stakingRoe: '1'
   }
 
   localDataDirty() {
@@ -856,6 +858,9 @@ export class FioEngine extends CurrencyEngine {
         balances.staked
       )
       balances.accrued = bns.mul(srps + '', roe)
+
+      this.otherData.srps = srps
+      this.otherData.stakingRoe = roe
     } catch (e) {
       this.log('checkAccountInnerLoop error: ' + e)
       nativeAmount = '0'
