@@ -10,6 +10,7 @@ import {
   type EdgeCurrencyTools,
   type EdgeFetchFunction,
   type EdgeFreshAddress,
+  type EdgeGetTransactionsOptions,
   type EdgeSpendInfo,
   type EdgeTransaction,
   type EdgeWalletInfo,
@@ -348,6 +349,43 @@ export class FioEngine extends CurrencyEngine {
 
   getBalance(options: any): string {
     return super.getBalance(options)
+  }
+
+  async getTransactions(
+    options: EdgeGetTransactionsOptions
+  ): Promise<EdgeTransaction[]> {
+    let list = await super.getTransactions(options)
+
+    if (options.startDate != null) {
+      const startTime = options.startDate.getTime()
+      list = list.filter((tx: EdgeTransaction) => tx.date * 1000 >= startTime)
+    }
+
+    if (options.searchString) {
+      const searchString = options.searchString.toLowerCase()
+      list = list.filter((tx: EdgeTransaction) => {
+        const { otherParams = { name: '', action: null, data: null } } = tx
+        if (!otherParams.name && !otherParams.action && !otherParams.data)
+          return false
+
+        if (otherParams.name.toLowerCase() === searchString) return true
+        if (
+          otherParams.action != null &&
+          otherParams.action.name.toLowerCase() === searchString
+        )
+          return true
+        if (
+          otherParams.data != null &&
+          otherParams.data.memo != null &&
+          otherParams.data.memo.toLowerCase() === searchString
+        )
+          return true
+
+        return false
+      })
+    }
+
+    return list
   }
 
   updateBalance(tk: string, balance: string) {
