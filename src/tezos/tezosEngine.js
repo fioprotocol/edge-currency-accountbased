@@ -2,6 +2,7 @@
 import { bns } from 'biggystring'
 import {
   type EdgeCurrencyEngineOptions,
+  type EdgeFetchFunction,
   type EdgeSpendInfo,
   type EdgeTransaction,
   type EdgeWalletInfo,
@@ -13,19 +14,19 @@ import { eztz } from 'eztz.js'
 import { CurrencyEngine } from '../common/engine.js'
 import {
   asyncWaterfall,
+  cleanTxLogs,
   getOtherParams,
   makeMutex,
-  promiseAny,
-  validateObject
+  promiseAny
 } from '../common/utils.js'
 import { TezosPlugin } from '../tezos/tezosPlugin.js'
 import { currencyInfo } from './tezosInfo.js'
-import { XtzTransactionSchema } from './tezosSchema.js'
 import {
   type HeadInfo,
   type OperationsContainer,
   type TezosOperation,
-  type XtzGetTransaction
+  type XtzGetTransaction,
+  asXtzGetTransaction
 } from './tezosTypes.js'
 
 const ADDRESS_POLL_MILLISECONDS = 15000
@@ -46,14 +47,17 @@ type TezosFunction =
 
 export class TezosEngine extends CurrencyEngine {
   tezosPlugin: TezosPlugin
+  fetchCors: EdgeFetchFunction
 
   constructor(
     currencyPlugin: TezosPlugin,
     walletInfo: EdgeWalletInfo,
-    opts: EdgeCurrencyEngineOptions
+    opts: EdgeCurrencyEngineOptions,
+    fetchCors: EdgeFetchFunction
   ) {
     super(currencyPlugin, walletInfo, opts)
     this.tezosPlugin = currencyPlugin
+    this.fetchCors = fetchCors
   }
 
   async multicastServers(func: TezosFunction, ...params: any): Promise<any> {
@@ -93,15 +97,14 @@ export class TezosEngine extends CurrencyEngine {
 
       case 'getNumberOfOperations':
         funcs = this.tezosPlugin.tezosApiServers.map(server => async () => {
-          const result = await this.io
-            .fetch(
-              `${server}/v3/number_operations/${params[0]}?type=Transaction`
-            )
+          const result = await this.fetchCors(
+            `${server}/v1/accounts/${params[0]}`
+          )
             .then(function (response) {
               return response.json()
             })
             .then(function (json) {
-              return json[0]
+              return json.numTransactions
             })
           return { server, result }
         })
@@ -110,17 +113,15 @@ export class TezosEngine extends CurrencyEngine {
 
       case 'getTransactions':
         funcs = this.tezosPlugin.tezosApiServers.map(server => async () => {
-          const pagination = /mystique/.test(server)
+          const pagination = /tzkt/.test(server)
             ? ''
             : `&p='${params[1]}&number=50`
-          const result: XtzGetTransaction = await this.io
-            .fetch(
-              `${server}/v3/operations/${params[0]}?type=Transaction` +
-                pagination
-            )
-            .then(function (response) {
-              return response.json()
-            })
+          const result: XtzGetTransaction = await this.fetchCors(
+            `${server}/v1/accounts/${params[0]}/operations?type=transaction` +
+              pagination
+          ).then(function (response) {
+            return response.json()
+          })
           return { server, result }
         })
         out = await asyncWaterfall(funcs)
@@ -157,7 +158,7 @@ export class TezosEngine extends CurrencyEngine {
           const result = await eztz.rpc
             .inject(params[0], params[1])
             .catch((e: Error) => {
-              this.log('Error when injection operation: ' + JSON.stringify(e))
+              this.error('Error when injection operation: ', e)
               const errorMessage = this.formatError(e)
               if (!preApplyError && errorMessage !== '') {
                 preApplyError = errorMessage
@@ -169,7 +170,7 @@ export class TezosEngine extends CurrencyEngine {
           return { server, result }
         })
         out = await asyncWaterfall(funcs).catch((e: Error) => {
-          this.log('Error from waterfall: ' + JSON.stringify(e))
+          this.error('Error from waterfall: ', e)
           if (preApplyError !== '') {
             throw new Error(preApplyError)
           } else {
@@ -188,7 +189,7 @@ export class TezosEngine extends CurrencyEngine {
           remainingRpcNodes.map(async server => {
             eztz.node.setProvider(server)
             const result = await eztz.rpc.silentInject(params[1])
-            this.log('Injected silently to: ' + server)
+            this.warn(`Injected silently to: ${server}`)
             return { server, result }
           })
         )
@@ -221,22 +222,20 @@ export class TezosEngine extends CurrencyEngine {
   }
 
   processTezosTransaction(tx: XtzGetTransaction) {
-    const valid = validateObject(tx, XtzTransactionSchema)
-    if (!valid) {
-      this.log('Invalid transaction!')
-      throw new Error('InvalidTransactionError')
-    }
+    const transaction = asXtzGetTransaction(tx)
     const pkh = this.walletLocalData.publicKey
-    const ourReceiveAddresses: Array<string> = []
+    const ourReceiveAddresses: string[] = []
     const currencyCode = PRIMARY_CURRENCY
-    const date = new Date(tx.type.operations[0].timestamp).getTime() / 1000
-    const blockHeight = tx.type.operations[0].op_level
-    let nativeAmount = tx.type.operations[0].amount.toString()
-    const networkFee = tx.type.operations[0].fee.toString()
-    const failedOperation = tx.type.operations[0].failed
-    if (pkh === tx.type.operations[0].destination.tz) {
+    const date = new Date(transaction.timestamp).getTime() / 1000
+    const blockHeight = transaction.level
+    let nativeAmount = transaction.amount.toString()
+    const networkFee = (
+      transaction.bakerFee + transaction.allocationFee
+    ).toString()
+    const failedOperation = transaction.status === 'failed'
+    if (pkh === transaction.target.address) {
       ourReceiveAddresses.push(pkh)
-      if (tx.type.source.tz === pkh) {
+      if (transaction.sender.address === pkh) {
         nativeAmount = '-' + networkFee
       }
     } else {
@@ -265,7 +264,7 @@ export class TezosEngine extends CurrencyEngine {
     }
     const num = await this.multicastServers('getNumberOfOperations', pkh)
     if (num !== this.otherData.numberTransactions) {
-      let txs: Array<XtzGetTransaction> = []
+      let txs: XtzGetTransaction[] = []
       let page = 0
       let transactions
       this.tokenCheckTransactionsStatus.XTZ = 0.5
@@ -308,6 +307,7 @@ export class TezosEngine extends CurrencyEngine {
     const balance = await this.multicastServers('getBalance', pkh)
     if (this.walletLocalData.totalBalances[currencyCode] !== balance) {
       this.walletLocalData.totalBalances[currencyCode] = balance
+      this.warn(`Updated ${currencyCode} balance ${balance}`)
       this.currencyEngineCallbacks.onBalanceChanged(currencyCode, balance)
     }
     this.tokenCheckBalanceStatus.XTZ = 1
@@ -359,17 +359,15 @@ export class TezosEngine extends CurrencyEngine {
     await this.startEngine()
   }
 
-  async makeSpend(edgeSpendInfoIn: EdgeSpendInfo) {
+  async makeSpend(edgeSpendInfoIn: EdgeSpendInfo): Promise<EdgeTransaction> {
     return makeSpendMutex(() => this.makeSpendInner(edgeSpendInfoIn))
   }
 
-  async makeSpendInner(edgeSpendInfoIn: EdgeSpendInfo) {
-    const {
-      edgeSpendInfo,
-      currencyCode,
-      nativeBalance,
-      denom
-    } = super.makeSpend(edgeSpendInfoIn)
+  async makeSpendInner(
+    edgeSpendInfoIn: EdgeSpendInfo
+  ): Promise<EdgeTransaction> {
+    const { edgeSpendInfo, currencyCode, nativeBalance, denom } =
+      super.makeSpend(edgeSpendInfoIn)
     if (edgeSpendInfo.spendTargets.length !== 1) {
       throw new Error('Error: only one output allowed')
     }
@@ -461,6 +459,7 @@ export class TezosEngine extends CurrencyEngine {
       otherParams.fullOp.opOb.signature = signed.edsig
       edgeTransaction.signedTx = signed.sbytes
     }
+    this.warn(`signTx\n${cleanTxLogs(edgeTransaction)}`)
     return edgeTransaction
   }
 
@@ -474,6 +473,7 @@ export class TezosEngine extends CurrencyEngine {
     const result = await this.multicastServers('injectOperation', opOb, opBytes)
     edgeTransaction.txid = result.hash
     edgeTransaction.date = Date.now() / 1000
+    this.warn(`SUCCESS broadcastTx\n${cleanTxLogs(edgeTransaction)}`)
     return edgeTransaction
   }
 

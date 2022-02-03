@@ -46,8 +46,15 @@ describe(`Tezos engine`, function () {
     onBlockHeightChanged(height) {
       emitter.emit('onBlockHeightChange', height)
     },
+    onStakingStatusChanged() {},
     onTransactionsChanged(transactionList) {
       emitter.emit('onTransactionsChanged', transactionList)
+    },
+    onAddressChanged() {
+      emitter.emit('addressChanged')
+    },
+    onWcNewContractCall(payload) {
+      emitter.emit('wcNewContractCall', payload)
     }
   }
   // $FlowFixMe

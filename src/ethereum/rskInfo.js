@@ -7,15 +7,15 @@ import type {
 } from 'edge-core-js/types'
 
 import { makeEthereumBasedPluginInner } from './ethPlugin'
-import type { EthereumSettings } from './ethTypes.js'
+import type { EthereumFees, EthereumSettings } from './ethTypes.js'
 
-export const imageServerUrl = 'https://developer.airbitz.co/content'
-
-const defaultNetworkFees = {
+const defaultNetworkFees: EthereumFees = {
   default: {
+    baseFeeMultiplier: undefined,
     gasLimit: {
       regularTransaction: '21000',
-      tokenTransaction: '200000'
+      tokenTransaction: '200000',
+      minGasLimit: '21000'
     },
     gasPrice: {
       lowFee: '59240000',
@@ -23,34 +23,36 @@ const defaultNetworkFees = {
       standardFeeHigh: '59240000',
       standardFeeLowAmount: '59240000',
       standardFeeHighAmount: '59240000',
-      highFee: '59240000'
-    }
+      highFee: '59240000',
+      minGasPrice: '59240000'
+    },
+    minPriorityFee: undefined
   }
 }
 
 const otherSettings: EthereumSettings = {
-  etherclusterApiServers: [],
+  rpcServers: ['https://public-node.rsk.co'],
   etherscanApiServers: ['https://blockscout.com/rsk/mainnet'],
   blockcypherApiServers: [],
-  superethServers: [],
-  infuraServers: ['https://public-node.rsk.co'],
-  isNestedInfuraParams: true,
-  infuraNeedProjectId: false,
+  blockbookServers: [],
   blockchairApiServers: [],
   alethioApiServers: [],
-  alethioCurrrencies: null,
+  alethioCurrencies: null,
   amberdataRpcServers: [],
   amberdataApiServers: [],
   amberDataBlockchainId: '', // Only used for ETH right now
   uriNetworks: ['rsk', 'rbtc'],
   ercTokenStandard: 'RRC20',
-  chainId: 30,
+  chainParams: {
+    chainId: 30,
+    name: 'RSK Mainnet'
+  },
   checkUnconfirmedTransactions: false,
   iosAllowedTokens: { RIF: true },
   hdPathCoinType: 137,
   pluginMnemonicKeyName: 'rskMnemonic',
   pluginRegularKeyName: 'rskKey',
-  ethGasStationUrl: '',
+  ethGasStationUrl: null,
   defaultNetworkFees
 }
 
@@ -63,7 +65,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
   // Basic currency information:
   currencyCode: 'RBTC',
   displayName: 'RSK',
-  pluginName: 'rsk',
+  pluginId: 'rsk',
   walletType: 'wallet:rsk',
 
   defaultSettings,
@@ -79,8 +81,6 @@ export const currencyInfo: EdgeCurrencyInfo = {
       symbol: 'RBTC'
     }
   ],
-  symbolImage: `${imageServerUrl}/rsk-logo-solo-64.png`, // TODO: add logo
-  symbolImageDarkMono: `${imageServerUrl}/rsk-logo-solo-64.png`,
   metaTokens: [
     // Array of objects describing the supported metatokens
     {
@@ -92,8 +92,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0x2acc95758f8b5f583470ba265eb685a8f45fc9d5',
-      symbolImage: `${imageServerUrl}/rif-logo-solo-64.png` // TODO: add rif logo
+      contractAddress: '0x2acc95758f8b5f583470ba265eb685a8f45fc9d5'
     }
   ]
 }

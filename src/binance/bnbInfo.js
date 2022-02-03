@@ -5,10 +5,13 @@ import type { EdgeCurrencyInfo } from 'edge-core-js/types'
 
 import type { BinanceSettings } from './bnbTypes.js'
 
-export const imageServerUrl = 'https://developer.airbitz.co/content'
-
 const otherSettings: BinanceSettings = {
-  binanceApiServers: ['https://dex.binance.org']
+  binanceApiServers: [
+    'https://dex.binance.org',
+    'https://dex-atlantic.binance.org',
+    'https://dex-asiapacific.binance.org',
+    'https://dex-european.binance.org'
+  ]
 }
 
 const defaultSettings: any = {
@@ -19,10 +22,12 @@ export const currencyInfo: EdgeCurrencyInfo = {
   // Basic currency information:
   currencyCode: 'BNB',
   displayName: 'Binance Chain',
-  pluginName: 'binance',
+  pluginId: 'binance',
   walletType: 'wallet:binance',
 
   defaultSettings,
+
+  memoMaxLength: 128,
 
   addressExplorer: 'https://explorer.binance.org/address/%s',
   transactionExplorer: 'https://explorer.binance.org/tx/%s',
@@ -36,7 +41,5 @@ export const currencyInfo: EdgeCurrencyInfo = {
       symbol: 'B'
     }
   ],
-  symbolImage: `${imageServerUrl}/binance-coin-logo-solo-64.png`,
-  symbolImageDarkMono: `${imageServerUrl}/binance-coin-logo-solo-64.png`,
   metaTokens: []
 }

@@ -3,8 +3,9 @@
  */
 // @flow
 
+import { getLocalStorage } from '@walletconnect/browser-utils'
 import { bns } from 'biggystring'
-import { generateMnemonic, mnemonicToSeedSync, validateMnemonic } from 'bip39'
+import { entropyToMnemonic, mnemonicToSeedSync, validateMnemonic } from 'bip39'
 import { Buffer } from 'buffer'
 import {
   type EdgeCorePluginOptions,
@@ -13,6 +14,7 @@ import {
   type EdgeCurrencyInfo,
   type EdgeCurrencyPlugin,
   type EdgeEncodeUri,
+  type EdgeFetchFunction,
   type EdgeIo,
   type EdgeMetaToken,
   type EdgeParsedUri,
@@ -22,22 +24,24 @@ import EthereumUtil from 'ethereumjs-util'
 import hdKey from 'ethereumjs-wallet/hdkey'
 
 import { CurrencyPlugin } from '../common/plugin.js'
-import { getDenomInfo } from '../common/utils.js'
+import { biggyScience, getDenomInfo, getFetchCors } from '../common/utils.js'
 import { EthereumEngine } from './ethEngine.js'
 
 export { calcMiningFee } from './ethMiningFees.js' // may be tricky for RSK
 
 export class EthereumPlugin extends CurrencyPlugin {
-  constructor(io: EdgeIo, currencyInfo: EdgeCurrencyInfo) {
-    super(io, currencyInfo.pluginName, currencyInfo)
+  constructor(
+    io: EdgeIo,
+    currencyInfo: EdgeCurrencyInfo,
+    fetchCors: EdgeFetchFunction
+  ) {
+    super(io, currencyInfo.pluginId, currencyInfo)
   }
 
   async importPrivateKey(userInput: string): Promise<Object> {
-    const { pluginName } = this.currencyInfo
-    const {
-      pluginMnemonicKeyName,
-      pluginRegularKeyName
-    } = this.currencyInfo.defaultSettings.otherSettings
+    const { pluginId } = this.currencyInfo
+    const { pluginMnemonicKeyName, pluginRegularKeyName } =
+      this.currencyInfo.defaultSettings.otherSettings
     if (/^(0x)?[0-9a-fA-F]{64}$/.test(userInput)) {
       // It looks like a private key, so validate the hex:
       const keyBuffer = Buffer.from(userInput.replace(/^0x/, ''), 'hex')
@@ -51,7 +55,7 @@ export class EthereumPlugin extends CurrencyPlugin {
         [pluginRegularKeyName]: hexKey
       }
       this.derivePublicKey({
-        type: `wallet:${pluginName}`,
+        type: `wallet:${pluginId}`,
         id: 'fake',
         keys
       })
@@ -72,17 +76,16 @@ export class EthereumPlugin extends CurrencyPlugin {
   }
 
   async createPrivateKey(walletType: string): Promise<Object> {
-    const {
-      pluginMnemonicKeyName,
-      pluginRegularKeyName
-    } = this.currencyInfo.defaultSettings.otherSettings
+    const { pluginMnemonicKeyName, pluginRegularKeyName } =
+      this.currencyInfo.defaultSettings.otherSettings
     const type = walletType.replace('wallet:', '')
 
-    if (type !== this.currencyInfo.pluginName) {
+    if (type !== this.currencyInfo.pluginId) {
       throw new Error('InvalidWalletType')
     }
 
-    const mnemonicKey = generateMnemonic(128).split(',').join(' ')
+    const entropy = Buffer.from(this.io.random(32))
+    const mnemonicKey = entropyToMnemonic(entropy)
 
     const hexKey = await this._mnemonicToHex(mnemonicKey) // will not have 0x in it
     return {
@@ -92,13 +95,10 @@ export class EthereumPlugin extends CurrencyPlugin {
   }
 
   async derivePublicKey(walletInfo: EdgeWalletInfo): Promise<Object> {
-    const { pluginName, defaultSettings } = this.currencyInfo
-    const {
-      hdPathCoinType,
-      pluginMnemonicKeyName,
-      pluginRegularKeyName
-    } = defaultSettings.otherSettings
-    if (walletInfo.type !== `wallet:${pluginName}`) {
+    const { pluginId, defaultSettings } = this.currencyInfo
+    const { hdPathCoinType, pluginMnemonicKeyName, pluginRegularKeyName } =
+      defaultSettings.otherSettings
+    if (walletInfo.type !== `wallet:${pluginId}`) {
       throw new Error('Invalid wallet type')
     }
     let address
@@ -144,9 +144,10 @@ export class EthereumPlugin extends CurrencyPlugin {
   async parseUri(
     uri: string,
     currencyCode?: string,
-    customTokens?: Array<EdgeMetaToken>
+    customTokens?: EdgeMetaToken[]
   ): Promise<EdgeParsedUri> {
-    const networks = {}
+    // By default, all EVM clones should be WalletConnect compatible.
+    const networks = { wc: true }
     this.currencyInfo.defaultSettings.otherSettings.uriNetworks.forEach(
       network => {
         networks[network] = true
@@ -160,9 +161,24 @@ export class EthereumPlugin extends CurrencyPlugin {
       currencyCode || this.currencyInfo.currencyCode,
       customTokens
     )
+
+    if (parsedUri.protocol === 'wc') {
+      if (parsedUri.query.bridge != null && parsedUri.query.key != null) {
+        edgeParsedUri.walletConnect = {
+          uri,
+          topic: parsedUri.pathname.split('@')[0],
+          version: parsedUri.pathname.split('@')[1],
+          bridge: parsedUri.query.bridge,
+          key: parsedUri.query.key
+        }
+        return edgeParsedUri
+      } else throw new Error('MissingWcBridgeKey')
+    }
+
     let address = ''
     if (edgeParsedUri.publicAddress) {
       address = edgeParsedUri.publicAddress
+      edgeParsedUri.publicAddress = edgeParsedUri.publicAddress.toLowerCase()
     }
 
     let [prefix, contractAddress] = address.split('-') // Split the address to get the prefix according to EIP-681
@@ -172,12 +188,22 @@ export class EthereumPlugin extends CurrencyPlugin {
       prefix = 'pay' // The default prefix according to EIP-681 is "pay"
     }
     address = contractAddress
-    // TODO: add chainId 30 to isValidAddress when included EIP-1191
-    const valid = EthereumUtil.isValidAddress(address || '')
-    if (!valid) {
+
+    // Verify checksum if it's present in the address
+    if (
+      /[A-F]/.test(address) &&
+      !EthereumUtil.isValidChecksumAddress(address)
+    ) {
       throw new Error('InvalidPublicAddressError')
     }
 
+    // Verify address is valid
+    address = address.toLowerCase()
+    if (!EthereumUtil.isValidAddress(address || '')) {
+      throw new Error('InvalidPublicAddressError')
+    }
+
+    // Parse according to EIP-961
     if (prefix === 'token' || prefix === 'token_info') {
       if (!parsedUri.query) throw new Error('InvalidUriError')
 
@@ -201,7 +227,7 @@ export class EthereumPlugin extends CurrencyPlugin {
       const edgeParsedUriToken: EdgeParsedUri = {
         token: {
           currencyCode,
-          contractAddress,
+          contractAddress: contractAddress.toLowerCase(),
           currencyName,
           multiplier,
           denominations: [{ name: currencyCode, multiplier }],
@@ -210,12 +236,76 @@ export class EthereumPlugin extends CurrencyPlugin {
       }
       return edgeParsedUriToken
     }
-    return edgeParsedUri
+
+    // Parse according to EIP-681
+    if (prefix === 'pay') {
+      const targetAddress = address
+      const functionName = parsedUri.pathname.split('/')[1]
+      const parameters = parsedUri.query
+
+      // Handle contract function invocations
+      // This is a very important measure to prevent accidental payment to contract addresses
+      switch (functionName) {
+        // ERC-20 token transfer
+        case 'transfer': {
+          const publicAddress = parameters.address ?? ''
+          const contractAddress = targetAddress ?? ''
+          const nativeAmount =
+            parameters.uint256 != null
+              ? biggyScience(parameters.uint256)
+              : edgeParsedUri.nativeAmount
+
+          // Get meta token from contract address
+          const metaToken = this.currencyInfo.metaTokens.find(
+            metaToken => metaToken.contractAddress === contractAddress
+          )
+
+          // If there is a currencyCode param, the metaToken must be found
+          // and it's currency code must matching the currencyCode param.
+          if (
+            currencyCode != null &&
+            (metaToken == null || metaToken.currencyCode !== currencyCode)
+          ) {
+            throw new Error('InternalErrorInvalidCurrencyCode')
+          }
+
+          // Validate addresses
+          if (!EthereumUtil.isValidAddress(publicAddress)) {
+            throw new Error('InvalidPublicAddressError')
+          }
+          if (!EthereumUtil.isValidAddress(contractAddress)) {
+            throw new Error('InvalidContractAddressError')
+          }
+
+          return {
+            ...edgeParsedUri,
+            currencyCode: metaToken?.currencyCode,
+            nativeAmount,
+            publicAddress
+          }
+        }
+        // ETH payment
+        case undefined: {
+          const publicAddress = targetAddress
+          const nativeAmount =
+            parameters.value != null
+              ? biggyScience(parameters.value)
+              : edgeParsedUri.nativeAmount
+
+          return { ...edgeParsedUri, publicAddress, nativeAmount }
+        }
+        default: {
+          throw new Error('UnsupportedContractFunction')
+        }
+      }
+    }
+
+    throw new Error('InvalidUriError')
   }
 
   async encodeUri(
     obj: EdgeEncodeUri,
-    customTokens?: Array<EdgeMetaToken>
+    customTokens?: EdgeMetaToken[]
   ): Promise<string> {
     const { publicAddress, nativeAmount, currencyCode } = obj
     const valid = EthereumUtil.isValidAddress(publicAddress)
@@ -236,7 +326,7 @@ export class EthereumPlugin extends CurrencyPlugin {
     }
     const encodedUri = this.encodeUriCommon(
       obj,
-      this.currencyInfo.pluginName,
+      this.currencyInfo.pluginId,
       amount
     )
     return encodedUri
@@ -248,11 +338,21 @@ export function makeEthereumBasedPluginInner(
   currencyInfo: EdgeCurrencyInfo
 ): EdgeCurrencyPlugin {
   const { io, initOptions } = opts
+  const fetchCors = getFetchCors(opts)
 
   let toolsPromise: Promise<EthereumPlugin>
   function makeCurrencyTools(): Promise<EthereumPlugin> {
     if (toolsPromise != null) return toolsPromise
-    toolsPromise = Promise.resolve(new EthereumPlugin(io, currencyInfo))
+    toolsPromise = Promise.resolve(
+      new EthereumPlugin(io, currencyInfo, fetchCors)
+    )
+
+    // FIXME: This clears locally stored walletconnect sessions that would otherwise prevent
+    // a user from reconnecting to an "active" but invisible connection. Future enhancement
+    // will restore these active sessions to the GUI
+    const wcStorage = getLocalStorage()
+    if (wcStorage != null) wcStorage.clear()
+
     return toolsPromise
   }
 
@@ -266,7 +366,8 @@ export function makeEthereumBasedPluginInner(
       walletInfo,
       initOptions,
       opts,
-      currencyInfo
+      currencyInfo,
+      fetchCors
     )
 
     // Do any async initialization necessary for the engine

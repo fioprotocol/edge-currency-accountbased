@@ -23,13 +23,13 @@ import { getDenomInfo } from '../common/utils.js'
 // TODO: pass in denoms pull code into common
 export class CurrencyPlugin {
   io: EdgeIo
-  pluginName: string
+  pluginId: string
   currencyInfo: EdgeCurrencyInfo
   highestTxHeight: number
 
-  constructor(io: EdgeIo, pluginName: string, currencyInfo: EdgeCurrencyInfo) {
+  constructor(io: EdgeIo, pluginId: string, currencyInfo: EdgeCurrencyInfo) {
     this.io = io
-    this.pluginName = pluginName
+    this.pluginId = pluginId
     this.currencyInfo = currencyInfo
     this.highestTxHeight = 0
   }
@@ -62,42 +62,49 @@ export class CurrencyPlugin {
     uri: string,
     networks: { [network: string]: boolean },
     currencyCode?: string,
-    customTokens?: Array<EdgeMetaToken>
+    customTokens?: EdgeMetaToken[]
   ) {
     const parsedUri = parse(uri, {}, true)
-    let address: string
+
+    // Add support for renproject Gateway URI type
+    const isGateway = uri.startsWith(`${currencyInfo.pluginId}://`)
 
     // Remove ":" from protocol
     if (parsedUri.protocol) {
       parsedUri.protocol = parsedUri.protocol.replace(':', '')
     }
 
+    // Wrong crypto type or protocol is not supported
     if (parsedUri.protocol && !networks[parsedUri.protocol]) {
-      throw new Error('InvalidUriError') // possibly scanning wrong crypto type
+      throw new Error(
+        `Uri protocol '${parsedUri.protocol}' is not supported for ${currencyInfo.pluginId}.`
+      )
     }
 
-    if (parsedUri.host) {
-      address = parsedUri.host
-    } else if (parsedUri.pathname) {
-      address = parsedUri.pathname
-    } else {
-      throw new Error('InvalidUriError')
+    // If no host and no path, then it's not a valid URI
+    if (parsedUri.host === '' && parsedUri.pathname === '') {
+      throw new Error('Path and host not found in uri.')
     }
 
-    address = address.replace('/', '') // Remove any slashes
+    // Address uses the host if present to support URLs with double-slashes (//)
+    const publicAddress =
+      parsedUri.host !== '' ? parsedUri.host : parsedUri.pathname.split('/')[0]
 
+    const edgeParsedUri: EdgeParsedUri = {
+      publicAddress
+    }
+
+    // Metadata query parameters
     const label = parsedUri.query.label
     const message = parsedUri.query.message
     const category = parsedUri.query.category
 
-    const edgeParsedUri: EdgeParsedUri = {
-      publicAddress: address
-    }
-    if (label || message || category) {
+    if (label || message || category || isGateway) {
       edgeParsedUri.metadata = {}
       edgeParsedUri.metadata.name = label || undefined
       edgeParsedUri.metadata.notes = message || undefined
       edgeParsedUri.metadata.category = category || undefined
+      edgeParsedUri.metadata.gateway = isGateway || undefined
     }
 
     const amountStr = parsedUri.query.amount

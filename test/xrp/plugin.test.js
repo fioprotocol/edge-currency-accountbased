@@ -27,7 +27,7 @@ for (const fixture of fixtures) {
     nativeIo: {},
     pluginDisklet: fakeIo.disklet
   }
-  const factory = edgeCorePlugins[fixture.pluginName]
+  const factory = edgeCorePlugins[fixture.pluginId]
   const plugin: EdgeCurrencyPlugin = factory(opts)
 
   describe(`parseUri for Wallet type ${WALLET_TYPE}`, function () {
@@ -61,6 +61,15 @@ for (const fixture of fixtures) {
       return expectRejection(
         tools.parseUri(fixture.parseUri['ripple.com invalid uri param'][0])
       )
+    })
+
+    // X-Address valid
+    it('x-address', async function () {
+      const parsedUri = await tools.parseUri(fixture.parseUri['x-address'][0])
+      assert.equal(parsedUri.publicAddress, fixture.parseUri['x-address'][1])
+      assert.equal(parsedUri.uniqueIdentifier, fixture.parseUri['x-address'][2])
+      assert.equal(parsedUri.nativeAmount, undefined)
+      assert.equal(parsedUri.currencyCode, undefined)
     })
 
     // Ripple.com valid URIs

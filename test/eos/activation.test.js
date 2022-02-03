@@ -50,9 +50,16 @@ describe(`EOS activation`, function () {
       // console.log('onBlockHeightChange:', height)
       emitter.emit('onBlockHeightChange', height)
     },
+    onStakingStatusChanged() {},
     onTransactionsChanged(transactionList) {
       // console.log('onTransactionsChanged:', transactionList)
       emitter.emit('onTransactionsChanged', transactionList)
+    },
+    onAddressChanged() {
+      emitter.emit('addressChanged')
+    },
+    onWcNewContractCall(payload) {
+      emitter.emit('wcNewContractCall', payload)
     }
   }
 
@@ -86,7 +93,8 @@ describe(`EOS activation`, function () {
 
   it.skip('getSupportedCurrencies', async function () {
     if (plugin.otherMethods) {
-      const result = await plugin.otherMethods.getActivationSupportedCurrencies()
+      const result =
+        await plugin.otherMethods.getActivationSupportedCurrencies()
       assert.equal(result.BTC, true)
       assert.equal(result.LTC, true)
     } else {
@@ -97,7 +105,7 @@ describe(`EOS activation`, function () {
   it('getActivationCost', async function () {
     this.timeout(10000)
     if (plugin.otherMethods) {
-      const result = await plugin.otherMethods.getActivationCost()
+      const result = await plugin.otherMethods.getActivationCost('EOS')
       const cost = Number(result)
       assert.equal(cost > 0.01, true)
     } else {

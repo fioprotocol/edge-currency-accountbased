@@ -1,7 +1,6 @@
 // @flow
 import { type EdgeCurrencyInfo } from 'edge-core-js/types'
 
-import { imageServerUrl } from '../common/utils'
 import { type TezosSettings } from './tezosTypes.js'
 
 const otherSettings: TezosSettings = {
@@ -22,7 +21,7 @@ const otherSettings: TezosSettings = {
     //  'https://teznode.letzbake.com',
     'https://mainnet.tezrpc.me'
   ],
-  tezosApiServers: ['https://mystique.tzkt.io', 'https://tzsimple.tulip.tools']
+  tezosApiServers: ['https://api.tzkt.io']
 }
 
 const defaultSettings: any = {
@@ -41,7 +40,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
   // Basic currency information:
   currencyCode: 'XTZ',
   displayName: 'Tezos',
-  pluginName: 'tezos',
+  pluginId: 'tezos',
   walletType: 'wallet:tezos',
 
   defaultSettings,
@@ -57,7 +56,5 @@ export const currencyInfo: EdgeCurrencyInfo = {
       symbol: 't'
     }
   ],
-  symbolImage: `${imageServerUrl}/tezos-logo-solo-64.png`,
-  symbolImageDarkMono: `${imageServerUrl}/tezos-logo-solo-64.png`,
   metaTokens: []
 }

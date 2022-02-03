@@ -3,29 +3,34 @@
 
 import { type EdgeCurrencyInfo } from 'edge-core-js/types'
 
-import { imageServerUrl } from '../common/utils'
 import { type XrpSettings } from './xrpTypes.js'
 
 const otherSettings: XrpSettings = {
-  rippledServers: [
-    'wss://s2.ripple.com',
-    'wss://rippled.xrptipbot.com',
-    'wss://s1.ripple.com'
-  ]
+  rippledServers: ['wss://s2.ripple.com', 'wss://xrplcluster.com'],
+  defaultFee: '10', // in drops
+  baseReserve: '10000000'
 }
 
 const defaultSettings: any = {
-  otherSettings
+  otherSettings,
+  errorCodes: {
+    UNIQUE_IDENTIFIER_EXCEEDS_LENGTH: 'UNIQUE_IDENTIFIER_EXCEEDS_LENGTH',
+    UNIQUE_IDENTIFIER_EXCEEDS_LIMIT: 'UNIQUE_IDENTIFIER_EXCEEDS_LIMIT',
+    UNIQUE_IDENTIFIER_FORMAT: 'UNIQUE_IDENTIFIER_FORMAT'
+  }
 }
 
 export const currencyInfo: EdgeCurrencyInfo = {
   // Basic currency information:
   currencyCode: 'XRP',
   displayName: 'XRP',
-  pluginName: 'ripple',
+  pluginId: 'ripple',
   walletType: 'wallet:ripple',
 
   defaultSettings,
+
+  memoMaxLength: 10,
+  memoMaxValue: '4294967295',
 
   addressExplorer: 'https://bithomp.com/explorer/%s',
   transactionExplorer: 'https://bithomp.com/explorer/%s',
@@ -38,7 +43,5 @@ export const currencyInfo: EdgeCurrencyInfo = {
       symbol: 'X'
     }
   ],
-  symbolImage: `${imageServerUrl}/ripple-logo-solo-64.png`,
-  symbolImageDarkMono: `${imageServerUrl}/ripple-logo-solo-64.png`,
   metaTokens: []
 }

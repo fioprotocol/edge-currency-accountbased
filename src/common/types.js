@@ -18,8 +18,8 @@ export type CustomToken = {
 }
 
 export type TxIdMap = { [currencyCode: string]: { [txid: string]: number } }
-export type TxIdList = { [currencyCode: string]: Array<string> }
-export type TransactionList = { [currencyCode: string]: Array<EdgeTransaction> }
+export type TxIdList = { [currencyCode: string]: string[] }
+export type TransactionList = { [currencyCode: string]: EdgeTransaction[] }
 
 export class WalletLocalData {
   blockHeight: number
@@ -28,9 +28,10 @@ export class WalletLocalData {
   lastTransactionDate: { [currencyCode: string]: number }
   publicKey: string
   totalBalances: { [currencyCode: string]: string }
-  enabledTokens: Array<string>
+  enabledTokens: string[]
   lastCheckedTxsDropped: number
   numUnconfirmedSpendTxs: number
+  numTransactions: { [currencyCode: string]: number }
   otherData: Object
 
   constructor(jsonString: string | null, primaryCurrency: string) {
@@ -42,6 +43,7 @@ export class WalletLocalData {
     this.lastTransactionDate = {}
     this.lastCheckedTxsDropped = 0
     this.numUnconfirmedSpendTxs = 0
+    this.numTransactions = {}
     this.otherData = {}
     this.publicKey = ''
     this.enabledTokens = [primaryCurrency]
@@ -56,6 +58,9 @@ export class WalletLocalData {
       }
       if (typeof data.numUnconfirmedSpendTxs === 'number') {
         this.numUnconfirmedSpendTxs = data.numUnconfirmedSpendTxs
+      }
+      if (typeof data.numTransactions === 'object') {
+        this.numTransactions = data.numTransactions
       }
       if (typeof data.lastAddressQueryHeight === 'number') {
         this.lastAddressQueryHeight = data.lastAddressQueryHeight

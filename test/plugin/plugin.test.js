@@ -33,7 +33,7 @@ for (const fixture of fixtures) {
     nativeIo: {},
     pluginDisklet: fakeIo.disklet
   }
-  const factory = edgeCorePlugins[fixture.pluginName]
+  const factory = edgeCorePlugins[fixture.pluginId]
   const plugin: EdgeCurrencyPlugin = factory(opts)
 
   describe(`Info for Wallet type ${WALLET_TYPE}`, function () {
@@ -110,6 +110,22 @@ for (const fixture of fixtures) {
       assert.equal(parsedUri.nativeAmount, undefined)
       assert.equal(parsedUri.currencyCode, undefined)
     })
+    if (fixture.parseUri['checksum address only'])
+      it('checksum address only', async function () {
+        const parsedUri = await tools.parseUri(
+          fixture.parseUri['checksum address only'][0]
+        )
+        assert.equal(
+          parsedUri.publicAddress,
+          fixture.parseUri['checksum address only'][1]
+        )
+      })
+    if (fixture.parseUri['invalid checksum address only'])
+      it('invalid checksum address only', async function () {
+        return expectRejection(
+          tools.parseUri(fixture.parseUri['invalid checksum address only'][0])
+        )
+      })
     it('invalid address', function () {
       return expectRejection(
         tools.parseUri(fixture.parseUri['invalid address'][0])
@@ -159,6 +175,25 @@ for (const fixture of fixtures) {
       assert.equal(
         parsedUri.uniqueIdentifier,
         fixture.parseUri['uri address with unique identifier'][3]
+      )
+    })
+    it('uri address with unique identifier and without network prefix', async function () {
+      const parsedUri = await tools.parseUri(
+        fixture.parseUri[
+          'uri address with unique identifier and without network prefix'
+        ][0]
+      )
+      assert.equal(
+        parsedUri.publicAddress,
+        fixture.parseUri[
+          'uri address with unique identifier and without network prefix'
+        ][1]
+      )
+      assert.equal(
+        parsedUri.uniqueIdentifier,
+        fixture.parseUri[
+          'uri address with unique identifier and without network prefix'
+        ][3]
       )
     })
     it('uri address with amount & label', async function () {
@@ -221,6 +256,46 @@ for (const fixture of fixtures) {
         parsedUri.currencyCode,
         fixture.parseUri['uri address with amount & label'][3]
       )
+    })
+
+    /*
+    interface TestCase {
+      args: any[],
+      output: {
+        [key: string]: any;
+      }
+    }
+    */
+    ;[
+      'address only with provided currency code',
+      'uri eip681 payment address',
+      'uri eip681 payment address with pay prefix',
+      'uri eip681 payment address using scientific notation',
+      'uri eip681 transfer contract invocation',
+      'RenBrige Gateway uri address with amount, label & message',
+      'RenBrige Gateway uri address'
+    ].forEach(function (caseName) {
+      const caseFixtures = fixture.parseUri[caseName]
+
+      if (caseFixtures == null) return
+
+      it(caseName, async function () {
+        // $FlowFixMe
+        const parsedUri = await tools.parseUri(...caseFixtures.args)
+
+        Object.entries(caseFixtures.output).forEach(([key, value]) => {
+          if (caseName === 'address only with provided currency code')
+            console.log(';;', parsedUri)
+
+          if (key === 'metadata') {
+            Object.keys(parsedUri[key]).forEach(metaKey => {
+              if (parsedUri[key][metaKey] === undefined)
+                delete parsedUri[key][metaKey]
+            })
+          }
+          assert.deepEqual(parsedUri[key], value)
+        })
+      })
     })
   })
 

@@ -1,89 +1,100 @@
-/* global */
+/**
+ * Created by on 2020-02-14
+ */
+/* global fetch */
 // @flow
 
-import { type EdgeCurrencyInfo } from 'edge-core-js/types'
+import {
+  type EdgeCorePluginOptions,
+  type EdgeCurrencyInfo
+} from 'edge-core-js/types'
 
-import { imageServerUrl } from '../common/utils'
-import { type EosSettings } from './eosTypes.js'
+import { makeEosBasedPluginInner } from './eosPlugin'
+import { type EosJsConfig, type EosSettings } from './eosTypes'
+
+const GREYMASS_FUEL_ACTION = {
+  authorization: [
+    {
+      actor: 'greymassfuel',
+      permission: 'cosign'
+    }
+  ],
+  account: 'greymassnoop',
+  name: 'noop',
+  data: {}
+}
+
+// ----EOSIO MAIN NET----
+export const eosJsConfig: EosJsConfig = {
+  chainId: 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906', // eosio main net
+  keyProvider: [],
+  httpEndpoint: '', // main net
+  fetch: fetch,
+  verbose: false // verbose logging such as API activity
+}
+
+const denominations = [
+  // An array of Objects of the possible denominations for this currency
+  {
+    name: 'EOS',
+    multiplier: '10000',
+    symbol: 'E'
+  }
+]
 
 const otherSettings: EosSettings = {
-  eosActivationServers: ['https://eos-pay-sf2.edgesecure.co'],
-  eosFuelServers: ['https://eos.greymass.com'],
-  eosHyperionNodes: ['https://api.eossweden.org', 'https://mainnet.eosn.io'],
+  eosActivationServers: ['https://eospay.edge.app'],
+  eosHyperionNodes: ['https://api.eossweden.org'],
   eosNodes: [
-    'https://api.redpacketeos.com',
     'https://api.eoseoul.io',
     'https://api.eoslaomao.com',
-    'https://eos-api.b1.run',
     'https://mainnet.eoscannon.io',
     'https://api.eos.wiki',
     'https://mainnet.eosio.sg',
     'https://eos.newdex.one',
     'https://api.bitmars.one',
     'https://node1.zbeos.com',
-    'https://pubnode.eosrapid.com',
-    'https://api.eosbeijing.one',
-    'https://api.eosn.io',
-    'https://eosapi.hoo.com',
-    'https://eos-api.inbex.com',
-    'https://api.bp.lambda.im',
-    'https://eos.eoscafeblock.com',
-    'https://publicapi-mainnet.eosauthority.com',
-    'https://mainnet.eoscanada.com',
-    'https://api.eos.education',
-    'https://api.eosargentina.io',
-    'https://api.acroeos.one',
-    'https://api.eostitan.com',
-    'https://eos-mainnet.ecoboost.app',
-    'https://bp.dexeos.io',
-    'https://hapi.eosrio.io',
-    'https://eu.eosdac.io',
-    'https://bp.cryptolions.io',
-    'https://eos.greymass.com',
-    'https://api-emlg.eosnairobi.io:8089',
-    'https://api.eoscleaner.com',
-    'https://mainnet.libertyblock.io:7777',
-    'https://mainnet.genereos.io',
-    'https://api.jeda.one',
-    'https://node1.eosphere.io',
-    'https://api.sheos.org',
-    'https://eos-mainnet.eosblocksmith.io:443',
-    'https://api-mainnet.eosgravity.com',
-    'https://api.tokenika.io',
-    'https://api.eostribe.io',
-    'https://node1.eosvibes.io',
-    'https://api.eosdetroit.io',
-    'https://eospublic.chainrift.com',
-    'https://eosapi.blockmatrix.network',
-    'https://node.eosflare.io'
-  ]
+    'https://api.eosn.io'
+  ],
+  eosFuelServers: ['https://eos.greymass.com'],
+  eosDfuseServers: ['https://eos.dfuse.eosnation.io'],
+  uriProtocol: 'eos',
+  fuelActions: [GREYMASS_FUEL_ACTION]
 }
 
 const defaultSettings: any = {
   otherSettings
 }
 
-export const currencyInfo: EdgeCurrencyInfo = {
+export const eosCurrencyInfo: EdgeCurrencyInfo = {
   // Basic currency information:
   currencyCode: 'EOS',
   displayName: 'EOS',
+  pluginId: 'eos',
   pluginName: 'eos',
   walletType: 'wallet:eos',
 
   defaultSettings,
 
-  addressExplorer: 'https://eospark.com/account/%s',
-  transactionExplorer: 'https://eospark.com/tx/%s',
+  memoMaxLength: 256,
 
-  denominations: [
-    // An array of Objects of the possible denominations for this currency
+  addressExplorer: 'https://bloks.io/account/%s',
+  transactionExplorer: 'https://bloks.io/transaction/%s',
+
+  denominations,
+  metaTokens: [
     {
       name: 'EOS',
+      currencyName: 'EOS',
       multiplier: '10000',
-      symbol: 'E'
+      symbol: 'E',
+      currencyCode: 'EOS',
+      contractAddress: 'eosio.token',
+      denominations
     }
-  ],
-  symbolImage: `${imageServerUrl}/eos-logo-solo-64.png`,
-  symbolImageDarkMono: `${imageServerUrl}/eos-logo-solo-64.png`,
-  metaTokens: []
+  ]
+}
+
+export const makeEosPlugin = (opts: EdgeCorePluginOptions) => {
+  return makeEosBasedPluginInner(opts, eosCurrencyInfo, eosJsConfig)
 }

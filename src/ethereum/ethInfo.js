@@ -6,15 +6,24 @@ import type {
   EdgeCurrencyInfo
 } from 'edge-core-js/types'
 
-import { imageServerUrl } from '../common/utils'
 import { makeEthereumBasedPluginInner } from './ethPlugin'
-import type { EthereumSettings } from './ethTypes.js'
+import type { EthereumFees, EthereumSettings } from './ethTypes.js'
 
-const defaultNetworkFees = {
+// 1 mainnet, 3 ropsten, 4 rinkeby, 5 goerli, 42 kovan, etc
+const chainId = 1
+
+const defaultNetworkFees: EthereumFees = {
   default: {
+    baseFeeMultiplier: {
+      lowFee: '1',
+      standardFeeLow: '1.25',
+      standardFeeHigh: '1.5',
+      highFee: '1.75'
+    },
     gasLimit: {
       regularTransaction: '21000',
-      tokenTransaction: '200000'
+      tokenTransaction: '300000',
+      minGasLimit: '21000'
     },
     gasPrice: {
       lowFee: '1000000001',
@@ -22,10 +31,13 @@ const defaultNetworkFees = {
       standardFeeHigh: '300000000001',
       standardFeeLowAmount: '100000000000000000',
       standardFeeHighAmount: '10000000000000000000',
-      highFee: '40000000001'
-    }
+      highFee: '40000000001',
+      minGasPrice: '1000000000'
+    },
+    minPriorityFee: '2000000000'
   },
   '1983987abc9837fbabc0982347ad828': {
+    baseFeeMultiplier: undefined,
     gasLimit: {
       regularTransaction: '21002',
       tokenTransaction: '37124'
@@ -37,30 +49,103 @@ const defaultNetworkFees = {
       standardFeeLowAmount: '200000000000000000',
       standardFeeHighAmount: '20000000000000000000',
       highFee: '40000000002'
-    }
+    },
+    minPriorityFee: undefined
   },
   '2983987abc9837fbabc0982347ad828': {
+    baseFeeMultiplier: undefined,
     gasLimit: {
       regularTransaction: '21002',
       tokenTransaction: '37124'
-    }
+    },
+    gasPrice: undefined,
+    minPriorityFee: undefined
   }
 }
 
 const otherSettings: EthereumSettings = {
-  etherclusterApiServers: [],
-  etherscanApiServers: [
-    'https://api.etherscan.io'
-    // 'https://blockscout.com/eth/mainnet' // not reliable enough...
-  ],
-  blockcypherApiServers: ['https://api.blockcypher.com'],
-  superethServers: ['https://supereth1.edgesecure.co:8443'],
-  infuraServers: ['https://mainnet.infura.io/v3'],
-  isNestedInfuraParams: false,
-  infuraNeedProjectId: true,
+  rpcServers: (() => {
+    // Mainnet | Ropsten | Rinkeby | Goerli | Kovan
+    switch (chainId) {
+      case 1:
+        return [
+          'https://eth-mainnet.alchemyapi.io',
+          'https://mainnet.infura.io/v3',
+          'https://cloudflare-eth.com'
+        ]
+      case 3:
+        return [
+          'https://eth-ropsten.alchemyapi.io',
+          'https://ropsten.infura.io/v3'
+        ]
+      case 4:
+        return [
+          'https://eth-rinkeby.alchemyapi.io',
+          'https://rinkeby.infura.io/v3'
+        ]
+      case 5:
+        return [
+          'https://eth-goerli.alchemyapi.io',
+          'https://goerli.infura.io/v3'
+        ]
+      case 42:
+        return ['https://eth-kovan.alchemyapi.io', 'https://kovan.infura.io/v3']
+      default:
+        return []
+    }
+  })(),
+
+  etherscanApiServers: (() => {
+    // Mainnet | Ropsten | Rinkeby | Goerli | Kovan
+    switch (chainId) {
+      case 1:
+        return [
+          'https://api.etherscan.io'
+          // 'https://blockscout.com/eth/mainnet' // not reliable enough...
+        ]
+      case 3:
+        return ['https://api-ropsten.etherscan.io']
+      case 4:
+        return ['https://api-rinkeby.etherscan.io']
+      case 5:
+        return ['https://api-goerli.etherscan.io']
+      case 42:
+        return ['https://api-kovan.etherscan.io']
+      default:
+        return []
+    }
+  })(),
+  blockcypherApiServers: (() => {
+    // Mainnet
+    switch (chainId) {
+      case 1:
+        return ['https://api.blockcypher.com']
+      default:
+        return []
+    }
+  })(),
+  blockbookServers: (() => {
+    // Mainnet | Ropsten
+    switch (chainId) {
+      case 1:
+        return [
+          'https://blockbook-ethereum.tronwallet.me',
+          'https://eth1.trezor.io',
+          'https://eth2.trezor.io',
+          'https://eth2.bcfn.ca'
+        ]
+      case 3:
+        return ['https://ropsten1.trezor.io', 'https://ropsten2.trezor.io']
+      default:
+        return []
+    }
+  })(),
   uriNetworks: ['ethereum', 'ether'],
   ercTokenStandard: 'ERC20',
-  chainId: 1,
+  chainParams: {
+    chainId,
+    name: 'Ethereum Mainnet'
+  },
   hdPathCoinType: 60,
   checkUnconfirmedTransactions: true,
   iosAllowedTokens: {
@@ -68,18 +153,49 @@ const otherSettings: EthereumSettings = {
     WINGS: true,
     HUR: true,
     IND: true,
-    USDT: true,
-    AGLD: true
+    USDT: true
   },
-  blockchairApiServers: ['https://api.blockchair.com'],
-  alethioApiServers: ['https://api.aleth.io/v1'],
+  blockchairApiServers: (() => {
+    // Mainnet
+    switch (chainId) {
+      case 1:
+        return ['https://api.blockchair.com']
+      default:
+        return []
+    }
+  })(),
+  alethioApiServers: (() => {
+    // Mainnet
+    switch (chainId) {
+      case 1:
+        return ['https://api.aleth.io/v1']
+      default:
+        return []
+    }
+  })(),
   alethioCurrencies: {
     // object or null
     native: 'ether',
     token: 'token'
   },
-  amberdataRpcServers: ['https://rpc.web3api.io'],
-  amberdataApiServers: ['https://web3api.io/api/v2'],
+  amberdataRpcServers: (() => {
+    // Mainnet
+    switch (chainId) {
+      case 1:
+        return ['https://rpc.web3api.io']
+      default:
+        return []
+    }
+  })(),
+  amberdataApiServers: (() => {
+    // Mainnet
+    switch (chainId) {
+      case 1:
+        return ['https://web3api.io/api/v2']
+      default:
+        return []
+    }
+  })(),
   amberDataBlockchainId: '1c9c969065fcd1cf', // ETH mainnet
   pluginMnemonicKeyName: 'ethereumMnemonic',
   pluginRegularKeyName: 'ethereumKey',
@@ -96,7 +212,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
   // Basic currency information:
   currencyCode: 'ETH',
   displayName: 'Ethereum',
-  pluginName: 'ethereum',
+  pluginId: 'ethereum',
   walletType: 'wallet:ethereum',
 
   defaultSettings,
@@ -117,8 +233,6 @@ export const currencyInfo: EdgeCurrencyInfo = {
       symbol: 'mΞ'
     }
   ],
-  symbolImage: `${imageServerUrl}/ethereum-logo-solo-64.png`,
-  symbolImageDarkMono: `${imageServerUrl}/ethereum-logo-solo-64.png`,
   metaTokens: [
     // Array of objects describing the supported metatokens
     {
@@ -130,8 +244,18 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0x1985365e9f78359a9B6AD760e32412f4a445E862',
-      symbolImage: `${imageServerUrl}/augur-logo-solo-64.png`
+      contractAddress: '0x1985365e9f78359a9B6AD760e32412f4a445E862'
+    },
+    {
+      currencyCode: 'REPV2',
+      currencyName: 'Augur v2',
+      denominations: [
+        {
+          name: 'REPV2',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0x221657776846890989a759BA2973e427DfF5C9bB'
     },
     {
       currencyCode: 'HERC',
@@ -142,20 +266,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0x2e91E3e54C5788e9FdD6A181497FDcEa1De1bcc1',
-      symbolImage: `${imageServerUrl}/herc-logo-solo-64.png`
-    },
-    {
-      currencyCode: 'AGLD',
-      currencyName: 'Anthem Gold',
-      denominations: [
-        {
-          name: 'AGLD',
-          multiplier: '1000000000'
-        }
-      ],
-      contractAddress: '0xd668dab892f1b702a6b9ee01342508b14d4e62c5',
-      symbolImage: `${imageServerUrl}/agld-logo-solo-64.png`
+      contractAddress: '0x2e91E3e54C5788e9FdD6A181497FDcEa1De1bcc1'
     },
     {
       currencyCode: 'DAI',
@@ -166,8 +277,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
-      symbolImage: `${imageServerUrl}/dai-logo-solo-64.png`
+      contractAddress: '0x6B175474E89094C44Da98b954EedeAC495271d0F'
     },
     {
       currencyCode: 'SAI',
@@ -178,8 +288,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359',
-      symbolImage: `${imageServerUrl}/sai-logo-solo-64.png`
+      contractAddress: '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359'
     },
     {
       currencyCode: 'WINGS',
@@ -190,8 +299,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0x667088b212ce3d06a1b553a7221E1fD19000d9aF',
-      symbolImage: `${imageServerUrl}/wings-logo-solo-64.png`
+      contractAddress: '0x667088b212ce3d06a1b553a7221E1fD19000d9aF'
     },
     {
       currencyCode: 'USDT',
@@ -202,8 +310,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000'
         }
       ],
-      contractAddress: '0xdac17f958d2ee523a2206206994597c13d831ec7',
-      symbolImage: `${imageServerUrl}/tether-logo-solo-64.png`
+      contractAddress: '0xdac17f958d2ee523a2206206994597c13d831ec7'
     },
     {
       currencyCode: 'IND',
@@ -214,8 +321,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0xf8e386EDa857484f5a12e4B5DAa9984E06E73705',
-      symbolImage: `${imageServerUrl}/indorse-logo-solo-64.png`
+      contractAddress: '0xf8e386EDa857484f5a12e4B5DAa9984E06E73705'
     },
     {
       currencyCode: 'HUR',
@@ -226,8 +332,18 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0xCDB7eCFd3403Eef3882c65B761ef9B5054890a47',
-      symbolImage: `${imageServerUrl}/hur-logo-solo-64.png`
+      contractAddress: '0xCDB7eCFd3403Eef3882c65B761ef9B5054890a47'
+    },
+    {
+      currencyCode: 'ANTV1',
+      currencyName: 'Aragon',
+      denominations: [
+        {
+          name: 'ANTV1',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0x960b236A07cf122663c4303350609A66A7B288C0'
     },
     {
       currencyCode: 'ANT',
@@ -238,8 +354,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0x960b236A07cf122663c4303350609A66A7B288C0',
-      symbolImage: `${imageServerUrl}/aragon-logo-solo-64.png`
+      contractAddress: '0xa117000000f279D81A1D3cc75430fAA017FA5A2e'
     },
     {
       currencyCode: 'BAT',
@@ -250,8 +365,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0x0D8775F648430679A709E98d2b0Cb6250d2887EF',
-      symbolImage: `${imageServerUrl}/basic-attention-token-logo-solo-64.png`
+      contractAddress: '0x0D8775F648430679A709E98d2b0Cb6250d2887EF'
     },
     {
       currencyCode: 'BNT',
@@ -262,20 +376,18 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0x1F573D6Fb3F13d689FF844B4cE37794d79a7FF1C',
-      symbolImage: `${imageServerUrl}/bancor-logo-solo-64.png`
+      contractAddress: '0x1F573D6Fb3F13d689FF844B4cE37794d79a7FF1C'
     },
     {
       currencyCode: 'GNT',
-      currencyName: 'Golem',
+      currencyName: 'Golem (old)',
       denominations: [
         {
           name: 'GNT',
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0xa74476443119A942dE498590Fe1f2454d7D4aC0d',
-      symbolImage: `${imageServerUrl}/golem-logo-solo-64.png`
+      contractAddress: '0xa74476443119A942dE498590Fe1f2454d7D4aC0d'
     },
     {
       currencyCode: 'KNC',
@@ -286,8 +398,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0xdd974D5C2e2928deA5F71b9825b8b646686BD200',
-      symbolImage: `${imageServerUrl}/kyber-network-logo-solo-64.png`
+      contractAddress: '0xdd974D5C2e2928deA5F71b9825b8b646686BD200'
     },
     {
       currencyCode: 'POLY',
@@ -298,8 +409,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0x9992eC3cF6A55b00978cdDF2b27BC6882d88D1eC',
-      symbolImage: `${imageServerUrl}/polymath-network-logo-solo-64.png`
+      contractAddress: '0x9992eC3cF6A55b00978cdDF2b27BC6882d88D1eC'
     },
     {
       currencyCode: 'STORJ',
@@ -310,8 +420,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '100000000'
         }
       ],
-      contractAddress: '0xB64ef51C888972c908CFacf59B47C1AfBC0Ab8aC',
-      symbolImage: `${imageServerUrl}/storj-logo-solo-64.png`
+      contractAddress: '0xB64ef51C888972c908CFacf59B47C1AfBC0Ab8aC'
     },
     {
       currencyCode: 'USDC',
@@ -322,8 +431,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000'
         }
       ],
-      contractAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-      symbolImage: `${imageServerUrl}/usd-coin-logo-solo-64.png`
+      contractAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'
     },
     {
       currencyCode: 'USDS',
@@ -334,8 +442,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000'
         }
       ],
-      contractAddress: '0xA4Bdb11dc0a2bEC88d24A3aa1E6Bb17201112eBe',
-      symbolImage: `${imageServerUrl}/stableusd-logo-solo-64.png`
+      contractAddress: '0xA4Bdb11dc0a2bEC88d24A3aa1E6Bb17201112eBe'
     },
     {
       currencyCode: 'TUSD',
@@ -346,8 +453,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0x0000000000085d4780B73119b644AE5ecd22b376',
-      symbolImage: `${imageServerUrl}/trueusd-logo-solo-64.png`
+      contractAddress: '0x0000000000085d4780B73119b644AE5ecd22b376'
     },
     {
       currencyCode: 'ZRX',
@@ -358,8 +464,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0xE41d2489571d322189246DaFA5ebDe1F4699F498',
-      symbolImage: `${imageServerUrl}/0x-logo-solo-64.png`
+      contractAddress: '0xE41d2489571d322189246DaFA5ebDe1F4699F498'
     },
     {
       currencyCode: 'GNO',
@@ -370,8 +475,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0x6810e776880C02933D47DB1b9fc05908e5386b96',
-      symbolImage: `${imageServerUrl}/gnosis-logo-solo-64.png`
+      contractAddress: '0x6810e776880C02933D47DB1b9fc05908e5386b96'
     },
     {
       currencyCode: 'OMG',
@@ -382,8 +486,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0xd26114cd6EE289AccF82350c8d8487fedB8A0C07',
-      symbolImage: `${imageServerUrl}/omisego-logo-solo-64.png`
+      contractAddress: '0xd26114cd6EE289AccF82350c8d8487fedB8A0C07'
     },
     {
       currencyCode: 'NMR',
@@ -394,8 +497,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0x1776e1F26f98b1A5dF9cD347953a26dd3Cb46671',
-      symbolImage: `${imageServerUrl}/numeraire-logo-solo-64.png`
+      contractAddress: '0x1776e1F26f98b1A5dF9cD347953a26dd3Cb46671'
     },
     {
       currencyCode: 'MKR',
@@ -406,8 +508,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2',
-      symbolImage: `${imageServerUrl}/maker-logo-solo-64.png`
+      contractAddress: '0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2'
     },
     {
       currencyCode: 'GUSD',
@@ -418,8 +519,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '100'
         }
       ],
-      contractAddress: '0x056fd409e1d7a124bd7017459dfea2f387b6d5cd',
-      symbolImage: `${imageServerUrl}/gemini-dollar-logo-solo-64.png`
+      contractAddress: '0x056fd409e1d7a124bd7017459dfea2f387b6d5cd'
     },
     {
       currencyCode: 'PAX',
@@ -430,8 +530,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0x8e870d67f660d95d5be530380d0ec0bd388289e1',
-      symbolImage: `${imageServerUrl}/paxos-logo-solo-64.png`
+      contractAddress: '0x8e870d67f660d95d5be530380d0ec0bd388289e1'
     },
     {
       currencyCode: 'SALT',
@@ -442,8 +541,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '100000000'
         }
       ],
-      contractAddress: '0x4156D3342D5c385a87D264F90653733592000581',
-      symbolImage: `${imageServerUrl}/salt-logo-solo-64.png`
+      contractAddress: '0x4156D3342D5c385a87D264F90653733592000581'
     },
     {
       currencyCode: 'MANA',
@@ -454,8 +552,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0x0F5D2fB29fb7d3CFeE444a200298f468908cC942',
-      symbolImage: `${imageServerUrl}/decentraland-logo-solo-64.png`
+      contractAddress: '0x0F5D2fB29fb7d3CFeE444a200298f468908cC942'
     },
     {
       currencyCode: 'NEXO',
@@ -466,8 +563,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0xb62132e35a6c13ee1ee0f84dc5d40bad8d815206',
-      symbolImage: `${imageServerUrl}/nexo-logo-solo-64.png`
+      contractAddress: '0xb62132e35a6c13ee1ee0f84dc5d40bad8d815206'
     },
     {
       currencyCode: 'FUN',
@@ -478,8 +574,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '100000000'
         }
       ],
-      contractAddress: '0x419D0d8BdD9aF5e606Ae2232ed285Aff190E711b',
-      symbolImage: `${imageServerUrl}/funfair-logo-solo-64.png`
+      contractAddress: '0x419D0d8BdD9aF5e606Ae2232ed285Aff190E711b'
     },
     {
       currencyCode: 'KIN',
@@ -490,8 +585,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0x818Fc6C2Ec5986bc6E2CBf00939d90556aB12ce5',
-      symbolImage: `${imageServerUrl}/kin-logo-solo-64.png`
+      contractAddress: '0x818Fc6C2Ec5986bc6E2CBf00939d90556aB12ce5'
     },
     {
       currencyCode: 'LINK',
@@ -502,8 +596,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0x514910771af9ca656af840dff83e8264ecf986ca',
-      symbolImage: `${imageServerUrl}/chainlink-logo-solo-64.png`
+      contractAddress: '0x514910771af9ca656af840dff83e8264ecf986ca'
     },
     {
       currencyCode: 'BRZ',
@@ -514,8 +607,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '10000'
         }
       ],
-      contractAddress: '0x420412E765BFa6d85aaaC94b4f7b708C89be2e2B',
-      symbolImage: `${imageServerUrl}/brz-logo-solo-64.png`
+      contractAddress: '0x420412E765BFa6d85aaaC94b4f7b708C89be2e2B'
     },
     {
       currencyCode: 'CREP',
@@ -526,8 +618,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '100000000'
         }
       ],
-      contractAddress: '0x158079ee67fce2f58472a96584a73c7ab9ac95c1',
-      symbolImage: `${imageServerUrl}/crep-logo-solo-64.png`
+      contractAddress: '0x158079ee67fce2f58472a96584a73c7ab9ac95c1'
     },
     {
       currencyCode: 'CUSDC',
@@ -538,8 +629,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '100000000'
         }
       ],
-      contractAddress: '0x39aa39c021dfbae8fac545936693ac917d5e7563',
-      symbolImage: `${imageServerUrl}/cusdc-logo-solo-64.png`
+      contractAddress: '0x39aa39c021dfbae8fac545936693ac917d5e7563'
     },
     {
       currencyCode: 'CETH',
@@ -550,8 +640,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '100000000'
         }
       ],
-      contractAddress: '0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5',
-      symbolImage: `${imageServerUrl}/ceth-logo-solo-64.png`
+      contractAddress: '0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5'
     },
     {
       currencyCode: 'CBAT',
@@ -562,8 +651,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '100000000'
         }
       ],
-      contractAddress: '0x6c8c6b02e7b2be14d4fa6022dfd6d75921d90e4e',
-      symbolImage: `${imageServerUrl}/cbat-logo-solo-64.png`
+      contractAddress: '0x6c8c6b02e7b2be14d4fa6022dfd6d75921d90e4e'
     },
     {
       currencyCode: 'CZRX',
@@ -574,8 +662,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '100000000'
         }
       ],
-      contractAddress: '0xb3319f5d18bc0d84dd1b4825dcde5d5f7266d407',
-      symbolImage: `${imageServerUrl}/czrx-logo-solo-64.png`
+      contractAddress: '0xb3319f5d18bc0d84dd1b4825dcde5d5f7266d407'
     },
     {
       currencyCode: 'CWBTC',
@@ -586,8 +673,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '100000000'
         }
       ],
-      contractAddress: '0xc11b1268c1a384e55c48c2391d8d480264a3a7f4',
-      symbolImage: `${imageServerUrl}/cwbtc-logo-solo-64.png`
+      contractAddress: '0xc11b1268c1a384e55c48c2391d8d480264a3a7f4'
     },
     {
       currencyCode: 'CSAI',
@@ -598,8 +684,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '100000000'
         }
       ],
-      contractAddress: '0xf5dce57282a584d2746faf1593d3121fcac444dc',
-      symbolImage: `${imageServerUrl}/csai-logo-solo-64.png`
+      contractAddress: '0xf5dce57282a584d2746faf1593d3121fcac444dc'
     },
     {
       currencyCode: 'CDAI',
@@ -610,8 +695,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '100000000'
         }
       ],
-      contractAddress: '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643',
-      symbolImage: `${imageServerUrl}/cdai-logo-solo-64.png`
+      contractAddress: '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643'
     },
     {
       currencyCode: 'ETHBNT',
@@ -622,8 +706,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0xb1CD6e4153B2a390Cf00A6556b0fC1458C4A5533',
-      symbolImage: `${imageServerUrl}/bancor-logo-solo-64.png`
+      contractAddress: '0xb1CD6e4153B2a390Cf00A6556b0fC1458C4A5533'
     },
     {
       currencyCode: 'OXT',
@@ -634,8 +717,18 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0x4575f41308EC1483f3d399aa9a2826d74Da13Deb',
-      symbolImage: `${imageServerUrl}/orchid-logo-solo-64.png`
+      contractAddress: '0x4575f41308EC1483f3d399aa9a2826d74Da13Deb'
+    },
+    {
+      currencyCode: 'COMP',
+      currencyName: 'Compound',
+      denominations: [
+        {
+          name: 'COMP',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0xc00e94cb662c3520282e6f5717214004a7f26888'
     },
     {
       currencyCode: 'MET',
@@ -646,8 +739,590 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0xa3d58c4e56fedcae3a7c43a725aee9a71f0ece4e',
-      symbolImage: `${imageServerUrl}/met-logo-solo-64.png`
+      contractAddress: '0xa3d58c4e56fedcae3a7c43a725aee9a71f0ece4e'
+    },
+    {
+      currencyCode: 'SNX',
+      currencyName: 'Synthetix Network',
+      denominations: [
+        {
+          name: 'SNX',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f'
+    },
+    {
+      currencyCode: 'SUSD',
+      currencyName: 'Synthetix USD',
+      denominations: [
+        {
+          name: 'SUSD',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0x57Ab1ec28D129707052df4dF418D58a2D46d5f51'
+    },
+    {
+      currencyCode: 'SBTC',
+      currencyName: 'Synthetix BTC',
+      denominations: [
+        {
+          name: 'SBTC',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0xfE18be6b3Bd88A2D2A7f928d00292E7a9963CfC6'
+    },
+    {
+      currencyCode: 'AAVE',
+      currencyName: 'Aave',
+      denominations: [
+        {
+          name: 'AAVE',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9'
+    },
+    {
+      currencyCode: 'AYFI',
+      currencyName: 'Aave Interest Bearing YFI',
+      denominations: [
+        {
+          name: 'AYFI',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0x5165d24277cd063f5ac44efd447b27025e888f37'
+    },
+    {
+      currencyCode: 'ALINK',
+      currencyName: 'Aave Interest Bearing LINK',
+      denominations: [
+        {
+          name: 'ALINK',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0xa06bc25b5805d5f8d82847d191cb4af5a3e873e0'
+    },
+    {
+      currencyCode: 'ADAI',
+      currencyName: 'Aave Interest Bearing Dai',
+      denominations: [
+        {
+          name: 'ADAI',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0x028171bCA77440897B824Ca71D1c56caC55b68A3'
+    },
+    {
+      currencyCode: 'ABAT',
+      currencyName: 'Aave Interest Bearing BAT',
+      denominations: [
+        {
+          name: 'ABAT',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0x05ec93c0365baaeabf7aeffb0972ea7ecdd39cf1'
+    },
+    {
+      currencyCode: 'AWETH',
+      currencyName: 'Aave Interest Bearing Wrapped ETH',
+      denominations: [
+        {
+          name: 'AWETH',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0x030ba81f1c18d280636f32af80b9aad02cf0854e'
+    },
+    {
+      currencyCode: 'AWBTC',
+      currencyName: 'Aave Interest Bearing Wrapped BTC',
+      denominations: [
+        {
+          name: 'AWBTC',
+          multiplier: '100000000'
+        }
+      ],
+      contractAddress: '0x9ff58f4ffb29fa2266ab25e75e2a8b3503311656'
+    },
+    {
+      currencyCode: 'ASNX',
+      currencyName: 'Aave Interest Bearing SNX',
+      denominations: [
+        {
+          name: 'ASNX',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0x35f6b052c598d933d69a4eec4d04c73a191fe6c2'
+    },
+    {
+      currencyCode: 'AREN',
+      currencyName: 'Aave Interest Bearing REN',
+      denominations: [
+        {
+          name: 'AREN',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0xcc12abe4ff81c9378d670de1b57f8e0dd228d77a'
+    },
+    {
+      currencyCode: 'AUSDT',
+      currencyName: 'Aave Interest Bearing USDT',
+      denominations: [
+        {
+          name: 'AUSDT',
+          multiplier: '1000000'
+        }
+      ],
+      contractAddress: '0x3ed3b47dd13ec9a98b44e6204a523e766b225811'
+    },
+    {
+      currencyCode: 'AMKR',
+      currencyName: 'Aave Interest Bearing MKR',
+      denominations: [
+        {
+          name: 'AMKR',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0xc713e5e149d5d0715dcd1c156a020976e7e56b88'
+    },
+    {
+      currencyCode: 'AMANA',
+      currencyName: 'Aave Interest Bearing MANA',
+      denominations: [
+        {
+          name: 'AMANA',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0xa685a61171bb30d4072b338c80cb7b2c865c873e'
+    },
+    {
+      currencyCode: 'AZRX',
+      currencyName: 'Aave Interest Bearing ZRX',
+      denominations: [
+        {
+          name: 'AZRX',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0xdf7ff54aacacbff42dfe29dd6144a69b629f8c9e'
+    },
+    {
+      currencyCode: 'AKNC',
+      currencyName: 'Aave Interest Bearing KNC',
+      denominations: [
+        {
+          name: 'AKNC',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0x39c6b3e42d6a679d7d776778fe880bc9487c2eda'
+    },
+    {
+      currencyCode: 'AUSDC',
+      currencyName: 'Aave Interest Bearing USDC',
+      denominations: [
+        {
+          name: 'AUSDC',
+          multiplier: '1000000'
+        }
+      ],
+      contractAddress: '0xbcca60bb61934080951369a648fb03df4f96263c'
+    },
+    {
+      currencyCode: 'ASUSD',
+      currencyName: 'Aave Interest Bearing SUSD',
+      denominations: [
+        {
+          name: 'ASUSD',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0x6c5024cd4f8a59110119c56f8933403a539555eb'
+    },
+    {
+      currencyCode: 'AUNI',
+      currencyName: 'Aave Interest Bearing UNI',
+      denominations: [
+        {
+          name: 'AUNI',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0xb9d7cb55f463405cdfbe4e90a6d2df01c2b92bf1'
+    },
+    {
+      currencyCode: 'WBTC',
+      currencyName: 'Wrapped Bitcoin',
+      denominations: [
+        {
+          name: 'WBTC',
+          multiplier: '100000000'
+        }
+      ],
+      contractAddress: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599'
+    },
+    {
+      currencyCode: 'YFI',
+      currencyName: 'Yearn Finance',
+      denominations: [
+        {
+          name: 'YFI',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e'
+    },
+    {
+      currencyCode: 'CRV',
+      currencyName: 'Curve DAO Token',
+      denominations: [
+        {
+          name: 'CRV',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0xD533a949740bb3306d119CC777fa900bA034cd52'
+    },
+    {
+      currencyCode: 'BAL',
+      currencyName: 'Balancer',
+      denominations: [
+        {
+          name: 'BAL',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0xba100000625a3754423978a60c9317c58a424e3d'
+    },
+    {
+      currencyCode: 'SUSHI',
+      currencyName: 'Sushi Token',
+      denominations: [
+        {
+          name: 'SUSHI',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0x6b3595068778dd592e39a122f4f5a5cf09c90fe2'
+    },
+    {
+      currencyCode: 'UMA',
+      currencyName: 'UMA',
+      denominations: [
+        {
+          name: 'UMA',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0x04Fa0d235C4abf4BcF4787aF4CF447DE572eF828'
+    },
+    {
+      currencyCode: 'BADGER',
+      currencyName: 'Badger',
+      denominations: [
+        {
+          name: 'BADGER',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0x3472A5A71965499acd81997a54BBA8D852C6E53d'
+    },
+    {
+      currencyCode: 'IDLE',
+      currencyName: 'Idle Finance',
+      denominations: [
+        {
+          name: 'IDLE',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0x875773784Af8135eA0ef43b5a374AaD105c5D39e'
+    },
+    {
+      currencyCode: 'NXM',
+      currencyName: 'Nexus Mutual',
+      denominations: [
+        {
+          name: 'NXM',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0xd7c49cee7e9188cca6ad8ff264c1da2e69d4cf3b'
+    },
+    {
+      currencyCode: 'CREAM',
+      currencyName: 'Cream',
+      denominations: [
+        {
+          name: 'CREAM',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0x2ba592F78dB6436527729929AAf6c908497cB200'
+    },
+    {
+      currencyCode: 'PICKLE',
+      currencyName: 'PickleToken',
+      denominations: [
+        {
+          name: 'PICKLE',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0x429881672B9AE42b8EbA0E26cD9C73711b891Ca5'
+    },
+    {
+      currencyCode: 'CVP',
+      currencyName: 'Concentrated Voting Power',
+      denominations: [
+        {
+          name: 'CVP',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0x38e4adb44ef08f22f5b5b76a8f0c2d0dcbe7dca1'
+    },
+    {
+      currencyCode: 'ROOK',
+      currencyName: 'Keeper DAO',
+      denominations: [
+        {
+          name: 'ROOK',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0xfA5047c9c78B8877af97BDcb85Db743fD7313d4a'
+    },
+    {
+      currencyCode: 'DOUGH',
+      currencyName: 'PieDAO',
+      denominations: [
+        {
+          name: 'DOUGH',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0xad32a8e6220741182940c5abf610bde99e737b2d'
+    },
+    {
+      currencyCode: 'COMBO',
+      currencyName: 'COMBO',
+      denominations: [
+        {
+          name: 'COMBO',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0xffffffff2ba8f66d4e51811c5190992176930278'
+    },
+    {
+      currencyCode: 'INDEX',
+      currencyName: 'INDEX COOP',
+      denominations: [
+        {
+          name: 'INDEX',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0x0954906da0Bf32d5479e25f46056d22f08464cab'
+    },
+    {
+      currencyCode: 'WETH',
+      currencyName: 'Wrapped ETH',
+      denominations: [
+        {
+          name: 'WETH',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+    },
+    {
+      currencyCode: 'RENBTC',
+      currencyName: 'Ren BTC',
+      denominations: [
+        {
+          name: 'RENBTC',
+          multiplier: '100000000'
+        }
+      ],
+      contractAddress: '0xeb4c2781e4eba804ce9a9803c67d0893436bb27d'
+    },
+    {
+      currencyCode: 'RENBCH',
+      currencyName: 'Ren BCH',
+      denominations: [
+        {
+          name: 'RENBCH',
+          multiplier: '100000000'
+        }
+      ],
+      contractAddress: '0x459086f2376525bdceba5bdda135e4e9d3fef5bf'
+    },
+    {
+      currencyCode: 'RENZEC',
+      currencyName: 'Ren ZEC',
+      denominations: [
+        {
+          name: 'RENZEC',
+          multiplier: '100000000'
+        }
+      ],
+      contractAddress: '0x1c5db575e2ff833e46a2e9864c22f4b22e0b37c2'
+    },
+    {
+      currencyCode: 'TBTC',
+      currencyName: 'tBTC',
+      denominations: [
+        {
+          name: 'TBTC',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0x8dAEBADE922dF735c38C80C7eBD708Af50815fAa'
+    },
+    {
+      currencyCode: 'DPI',
+      currencyName: 'DefiPulse Index',
+      denominations: [
+        {
+          name: 'DPI',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0x1494ca1f11d487c2bbe4543e90080aeba4ba3c2b'
+    },
+    {
+      currencyCode: 'YETI',
+      currencyName: 'Yearn Ecosystem Token Index',
+      denominations: [
+        {
+          name: 'YETI',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0xb4bebd34f6daafd808f73de0d10235a92fbb6c3d'
+    },
+    {
+      currencyCode: 'BAND',
+      currencyName: 'BAND',
+      denominations: [
+        {
+          name: 'BAND',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0xba11d00c5f74255f56a5e366f4f77f5a186d7f55'
+    },
+    {
+      currencyCode: 'REN',
+      currencyName: 'Ren',
+      denominations: [
+        {
+          name: 'REN',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0x408e41876cccdc0f92210600ef50372656052a38'
+    },
+    {
+      currencyCode: 'AMPL',
+      currencyName: 'Ampleforth',
+      denominations: [
+        {
+          name: 'AMPL',
+          multiplier: '1000000000'
+        }
+      ],
+      contractAddress: '0xd46ba6d942050d489dbd938a2c909a5d5039a161'
+    },
+    {
+      currencyCode: 'OCEAN',
+      currencyName: 'OCEAN',
+      denominations: [
+        {
+          name: 'OCEAN',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0x967da4048cD07aB37855c090aAF366e4ce1b9F48'
+    },
+    {
+      currencyCode: 'GLM',
+      currencyName: 'Golem',
+      denominations: [
+        {
+          name: 'GLM',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0x7DD9c5Cba05E151C895FDe1CF355C9A1D5DA6429'
+    },
+    {
+      currencyCode: 'UNI',
+      currencyName: 'Uniswap',
+      denominations: [
+        {
+          name: 'UNI',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984'
+    },
+    {
+      currencyCode: 'MATIC',
+      currencyName: 'Polygon',
+      denominations: [
+        {
+          name: 'MATIC',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0'
+    },
+    {
+      currencyCode: 'BNB',
+      currencyName: 'Binance',
+      denominations: [
+        {
+          name: 'BNB',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0xB8c77482e45F1F44dE1745F52C74426C631bDD52'
+    },
+    {
+      currencyCode: 'FTM',
+      currencyName: 'Fantom',
+      denominations: [
+        {
+          name: 'FTM',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0x4e15361fd6b4bb609fa63c81a2be19d873717870'
+    },
+    {
+      currencyCode: '1INCH',
+      currencyName: '1inch',
+      denominations: [
+        {
+          name: '1INCH',
+          multiplier: '1000000000000000000'
+        }
+      ],
+      contractAddress: '0x111111111117dc0aa78b770fa6a738034120c302'
     }
   ]
 }

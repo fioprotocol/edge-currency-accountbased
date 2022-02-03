@@ -41,7 +41,7 @@ for (const fixture of fixtures) {
     nativeIo: {},
     pluginDisklet: fakeIo.disklet
   }
-  const factory = edgeCorePlugins[fixture.pluginName]
+  const factory = edgeCorePlugins[fixture.pluginId]
   const plugin: EdgeCurrencyPlugin = factory(opts)
 
   const emitter = new EventEmitter()
@@ -62,9 +62,16 @@ for (const fixture of fixtures) {
       // console.log('onBlockHeightChange:', height)
       emitter.emit('onBlockHeightChange', height)
     },
+    onStakingStatusChanged() {},
     onTransactionsChanged(transactionList) {
       // console.log('onTransactionsChanged:', transactionList)
       emitter.emit('onTransactionsChanged', transactionList)
+    },
+    onAddressChanged() {
+      emitter.emit('addressChanged')
+    },
+    onWcNewContractCall(payload) {
+      emitter.emit('wcNewContractCall', payload)
     }
   }
 
@@ -144,7 +151,7 @@ for (const fixture of fixtures) {
 
   describe('Start engine', function () {
     it('Get BlockHeight', function (done) {
-      this.timeout(10000)
+      this.timeout(100000)
       emitter.once('onBlockHeightChange', height => {
         const thirdPartyHeight = 1578127
         // this validation is not OK for RSK
@@ -164,6 +171,24 @@ for (const fixture of fixtures) {
       engine.startEngine().catch(e => {
         console.log('startEngine error', e, e.message)
       })
+    })
+  })
+
+  describe('Message signing', function () {
+    if (fixture.messages == null) return
+    it('Should sign a hashed message', async function () {
+      if (!engine) throw new Error('ErrorNoEngine')
+      // $FlowFixMe
+      const sig = engine.utils.signMessage(fixture.messages.eth_sign.param)
+      assert.equal(sig, fixture.messages.eth_sign.signature)
+    })
+    it('Should sign a typed message', function () {
+      if (!engine) throw new Error('ErrorNoEngine')
+      // $FlowFixMe
+      const sig = engine.utils.signTypedData(
+        fixture.messages.eth_signTypedData.param
+      )
+      assert.equal(sig, fixture.messages.eth_signTypedData.signature)
     })
   })
 
@@ -201,9 +226,17 @@ const callbacks: EdgeCurrencyEngineCallbacks = {
     // console.log('onBlockHeightChange:', height)
     emitter.emit('onBlockHeightChange', height)
   },
+  onStakingStatusChanged() {},
   onTransactionsChanged(transactionList) {
     // console.log('onTransactionsChanged:', transactionList)
     emitter.emit('onTransactionsChanged', transactionList)
+  },
+  onAddressChanged() {
+    // console.log('onTransactionsChanged:', transactionList)
+    emitter.emit('addressChanged')
+  },
+  onWcNewContractCall(payload) {
+    emitter.emit('wcNewContractCall', payload)
   }
 }
 
@@ -291,7 +324,7 @@ describe('Test transaction list updating', () => {
   })
 
   it('Confirm transactions and check none dropped', () => {
-    const updatedTxs: Array<any> = [
+    const updatedTxs: any[] = [
       {
         txid: '001',
         date: 1555550000,
@@ -325,7 +358,7 @@ describe('Test transaction list updating', () => {
   })
 
   it('Confirm transactions and check dropped', () => {
-    const updatedTxs: Array<any> = [
+    const updatedTxs: any[] = [
       {
         txid: '001',
         date: 1555550000,
@@ -369,7 +402,7 @@ describe('Test transaction list updating', () => {
   })
 
   it('Confirm transactions and check dropped 2', () => {
-    const updatedTxs: Array<any> = [
+    const updatedTxs: any[] = [
       {
         txid: '001',
         date: 1555550000,

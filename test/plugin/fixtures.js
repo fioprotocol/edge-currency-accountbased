@@ -1,41 +1,11 @@
 export default [
   {
-    pluginName: 'binance',
+    pluginId: 'binance',
     WALLET_TYPE: 'wallet:binance',
     'Test Currency code': 'BNB',
     key: [
-      39,
-      190,
-      34,
-      129,
-      208,
-      32,
-      145,
-      88,
-      191,
-      217,
-      226,
-      98,
-      183,
-      16,
-      52,
-      150,
-      52,
-      53,
-      31,
-      137,
-      164,
-      40,
-      236,
-      146,
-      128,
-      107,
-      129,
-      59,
-      192,
-      240,
-      40,
-      238
+      39, 190, 34, 129, 208, 32, 145, 88, 191, 217, 226, 98, 183, 16, 52, 150,
+      52, 53, 31, 137, 164, 40, 236, 146, 128, 107, 129, 59, 192, 240, 40, 238
     ],
     xpub: 'bnb1ytwkmhg4k3zqzqwfuyeqr7cxs2xzlrgx695luv',
     key_length: 64,
@@ -73,6 +43,12 @@ export default [
         'BNB',
         '123456700'
       ],
+      'uri address with unique identifier and without network prefix': [
+        'bnb1ytwkmhg4k3zqzqwfuyeqr7cxs2xzlrgx695luv?memo=123456700',
+        'bnb1ytwkmhg4k3zqzqwfuyeqr7cxs2xzlrgx695luv',
+        'BNB',
+        '123456700'
+      ],
       'uri address with amount & label': [
         'binance:bnb1ytwkmhg4k3zqzqwfuyeqr7cxs2xzlrgx695luv?amount=12.34567&label=Johnny%20Binance',
         'bnb1ytwkmhg4k3zqzqwfuyeqr7cxs2xzlrgx695luv',
@@ -93,7 +69,31 @@ export default [
         'bnb1ytwkmhg4k3zqzqwfuyeqr7cxs2xzlrgx695luv',
         '1234567000',
         'BNB'
-      ]
+      ],
+      'RenBrige Gateway uri address': {
+        args: ['binance://bnb1ytwkmhg4k3zqzqwfuyeqr7cxs2xzlrgx695luv'],
+        output: {
+          publicAddress: 'bnb1ytwkmhg4k3zqzqwfuyeqr7cxs2xzlrgx695luv',
+          metadata: {
+            gateway: true
+          }
+        }
+      },
+      'RenBrige Gateway uri address with amount, label & message': {
+        args: [
+          'binance://bnb1ytwkmhg4k3zqzqwfuyeqr7cxs2xzlrgx695luv?amount=12.34567&label=Johnny%20Binance&message=Hello%20World,%20I%20miss%20you%20!'
+        ],
+        output: {
+          publicAddress: 'bnb1ytwkmhg4k3zqzqwfuyeqr7cxs2xzlrgx695luv',
+          metadata: {
+            name: 'Johnny Binance',
+            notes: 'Hello World, I miss you !',
+            gateway: true
+          },
+          nativeAmount: '1234567000',
+          currencyCode: 'BNB'
+        }
+      }
     },
     encodeUri: {
       'address only': [
@@ -142,42 +142,12 @@ export default [
     }
   },
   {
-    pluginName: 'stellar',
+    pluginId: 'stellar',
     WALLET_TYPE: 'wallet:stellar',
     'Test Currency code': 'XLM',
     key: [
-      39,
-      190,
-      34,
-      129,
-      208,
-      32,
-      145,
-      88,
-      191,
-      217,
-      226,
-      98,
-      183,
-      16,
-      52,
-      150,
-      52,
-      53,
-      31,
-      137,
-      164,
-      40,
-      236,
-      146,
-      128,
-      107,
-      129,
-      59,
-      192,
-      240,
-      40,
-      238
+      39, 190, 34, 129, 208, 32, 145, 88, 191, 217, 226, 98, 183, 16, 52, 150,
+      52, 53, 31, 137, 164, 40, 236, 146, 128, 107, 129, 59, 192, 240, 40, 238
     ],
     xpub: 'GDUHWCM6NMEVYZKLPJBS45H5OFRVUO4KOIVBIGWZEPMZUOTHBGOL5FAD',
     key_length: 56,
@@ -211,6 +181,12 @@ export default [
       ],
       'uri address with unique identifier': [
         'web+stellar:pay?destination=GDUHWCM6NMEVYZKLPJBS45H5OFRVUO4KOIVBIGWZEPMZUOTHBGOL5FAD&memo=123456789&memo_type=MEMO_ID',
+        'GDUHWCM6NMEVYZKLPJBS45H5OFRVUO4KOIVBIGWZEPMZUOTHBGOL5FAD',
+        'XLM',
+        '123456789'
+      ],
+      'uri address with unique identifier and without network prefix': [
+        'GDUHWCM6NMEVYZKLPJBS45H5OFRVUO4KOIVBIGWZEPMZUOTHBGOL5FAD?memo=123456789&memo_type=MEMO_ID',
         'GDUHWCM6NMEVYZKLPJBS45H5OFRVUO4KOIVBIGWZEPMZUOTHBGOL5FAD',
         'XLM',
         '123456789'
@@ -289,42 +265,12 @@ export default [
     }
   },
   {
-    pluginName: 'ripple',
+    pluginId: 'ripple',
     WALLET_TYPE: 'wallet:ripple',
     'Test Currency code': 'XRP',
     key: [
-      39,
-      190,
-      34,
-      129,
-      208,
-      32,
-      145,
-      88,
-      191,
-      217,
-      226,
-      98,
-      183,
-      16,
-      52,
-      150,
-      52,
-      53,
-      31,
-      137,
-      164,
-      40,
-      236,
-      146,
-      128,
-      107,
-      129,
-      59,
-      192,
-      240,
-      40,
-      238
+      39, 190, 34, 129, 208, 32, 145, 88, 191, 217, 226, 98, 183, 16, 52, 150,
+      52, 53, 31, 137, 164, 40, 236, 146, 128, 107, 129, 59, 192, 240, 40, 238
     ],
     xpub: 'rHjiXf39KxewZrUy2NK5UuW96dMiEjQVcT',
     key_length: 31,
@@ -358,6 +304,12 @@ export default [
       ],
       'uri address with unique identifier': [
         'ripple:rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn?dt=123456789',
+        'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
+        'XRP',
+        '123456789'
+      ],
+      'uri address with unique identifier and without network prefix': [
+        'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn?dt=123456789',
         'rf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn',
         'XRP',
         '123456789'
@@ -427,42 +379,12 @@ export default [
     }
   },
   {
-    pluginName: 'ethereum',
+    pluginId: 'ethereum',
     WALLET_TYPE: 'wallet:ethereum',
     'Test Currency code': 'ETH',
     key: [
-      39,
-      190,
-      34,
-      129,
-      208,
-      32,
-      145,
-      88,
-      191,
-      217,
-      226,
-      98,
-      183,
-      16,
-      52,
-      150,
-      52,
-      53,
-      31,
-      137,
-      164,
-      40,
-      236,
-      146,
-      128,
-      107,
-      129,
-      59,
-      192,
-      240,
-      40,
-      238
+      39, 190, 34, 129, 208, 32, 145, 88, 191, 217, 226, 98, 183, 16, 52, 150,
+      52, 53, 31, 137, 164, 40, 236, 146, 128, 107, 129, 59, 192, 240, 40, 238
     ],
     mnemonic:
       'room soda device label bicycle hill fork nest lion knee purpose hen',
@@ -481,6 +403,19 @@ export default [
         '0x04b6b3bcbc16a5fb6a20301d650f8def513122a8',
         '0x04b6b3bcbc16a5fb6a20301d650f8def513122a8'
       ],
+      'address with provided currency code': {
+        args: ['0x04b6b3bcbc16a5fb6a20301d650f8def513122a8', 'USDC'],
+        output: {
+          publicAddress: '0x04b6b3bcbc16a5fb6a20301d650f8def513122a8'
+        }
+      },
+      'checksum address only': [
+        '0x3C40cbb7F82A7E1bc83C4E3E98590b19e0e1bf07',
+        '0x3c40cbb7f82a7e1bc83c4e3e98590b19e0e1bf07'
+      ],
+      'invalid checksum address only': [
+        '0x3C40cbb7F82A7E1bc83C4E3E98590b19e0e1Bf07'
+      ],
       'invalid address': [
         '0x466d506cd7fbcd29a06015da03f0de814df050ez',
         '0466d506cd7fbcd29a06015da03f0de814df050ee',
@@ -498,6 +433,11 @@ export default [
       ],
       'uri address with unique identifier': [
         'ethereum:0x04b6b3bcbc16a5fb6a20301d650f8def513122a8?dt=123456789',
+        '0x04b6b3bcbc16a5fb6a20301d650f8def513122a8',
+        'ETH'
+      ],
+      'uri address with unique identifier and without network prefix': [
+        '0x04b6b3bcbc16a5fb6a20301d650f8def513122a8?dt=123456789',
         '0x04b6b3bcbc16a5fb6a20301d650f8def513122a8',
         'ETH'
       ],
@@ -521,7 +461,67 @@ export default [
         '0x04b6b3bcbc16a5fb6a20301d650f8def513122a8',
         '12345678900000000000000',
         'ETH'
-      ]
+      ],
+      'uri eip681 payment address': {
+        args: ['ethereum:0xf5d81254c269a1e984044e4d542adc07bf18c541?value=123'],
+        output: {
+          publicAddress: '0xf5d81254c269a1e984044e4d542adc07bf18c541',
+          nativeAmount: '123'
+        }
+      },
+      'uri eip681 payment address with pay prefix': {
+        args: [
+          'ethereum:pay-0xf5d81254c269a1e984044e4d542adc07bf18c541?value=123'
+        ],
+        output: {
+          publicAddress: '0xf5d81254c269a1e984044e4d542adc07bf18c541',
+          nativeAmount: '123'
+        }
+      },
+      'uri eip681 payment address using scientific notation': {
+        args: [
+          'ethereum:0xf5d81254c269a1e984044e4d542adc07bf18c541?value=2.014e18'
+        ],
+        output: {
+          publicAddress: '0xf5d81254c269a1e984044e4d542adc07bf18c541',
+          nativeAmount: '2014000000000000000'
+        }
+      },
+      'uri eip681 transfer contract invocation': {
+        args: [
+          'ethereum:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48/transfer?address=0xf5d81254c269a1e984044e4d542adc07bf18c541&uint256=2.014e6',
+          'USDC'
+        ],
+        output: {
+          publicAddress: '0xf5d81254c269a1e984044e4d542adc07bf18c541',
+          nativeAmount: '2014000',
+          currencyCode: 'USDC'
+        }
+      },
+      'RenBrige Gateway uri address': {
+        args: ['ethereum://0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'],
+        output: {
+          publicAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+          metadata: {
+            gateway: true
+          }
+        }
+      },
+      'RenBrige Gateway uri address with amount, label & message': {
+        args: [
+          'ethereum://0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48?amount=12345.6789&label=Johnny%20Ethereum&message=Hello%20World,%20I%20miss%20you%20!'
+        ],
+        output: {
+          publicAddress: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+          metadata: {
+            name: 'Johnny Ethereum',
+            notes: 'Hello World, I miss you !',
+            gateway: true
+          },
+          nativeAmount: '12345678900000000000000',
+          currencyCode: 'ETH'
+        }
+      }
     },
     encodeUri: {
       'address only': [
@@ -566,41 +566,12 @@ export default [
     }
   },
   {
-    pluginName: 'rsk',
+    pluginId: 'rsk',
     WALLET_TYPE: 'wallet:rsk',
     'Test Currency code': 'RBTC',
     key: [
-      50,
-      192,
-      187,
-      195,
-      192,
-      185,
-      27,
-      214,
-      12,
-      103,
-      95,
-      39,
-      42,
-      98,
-      19,
-      120,
-      189,
-      200,
-      169,
-      242,
-      151,
-      116,
-      39,
-      138,
-      171,
-      229,
-      103,
-      252,
-      87,
-      185,
-      25,
+      50, 192, 187, 195, 192, 185, 27, 214, 12, 103, 95, 39, 42, 98, 19, 120,
+      189, 200, 169, 242, 151, 116, 39, 138, 171, 229, 103, 252, 87, 185, 25,
       135
     ],
     mnemonic:
@@ -637,6 +608,11 @@ export default [
       ],
       'uri address with unique identifier': [
         'rsk:0x04b6b3bcbc16a5fb6a20301d650f8def513122a8?dt=123456789',
+        '0x04b6b3bcbc16a5fb6a20301d650f8def513122a8',
+        'RBTC'
+      ],
+      'uri address with unique identifier and without network prefix': [
+        '0x04b6b3bcbc16a5fb6a20301d650f8def513122a8?dt=123456789',
         '0x04b6b3bcbc16a5fb6a20301d650f8def513122a8',
         'RBTC'
       ],
@@ -705,42 +681,12 @@ export default [
     }
   },
   {
-    pluginName: 'fio',
+    pluginId: 'fio',
     WALLET_TYPE: 'wallet:fio',
     'Test Currency code': 'FIO',
     key: [
-      39,
-      190,
-      34,
-      129,
-      208,
-      32,
-      145,
-      88,
-      191,
-      217,
-      226,
-      98,
-      183,
-      16,
-      52,
-      150,
-      52,
-      53,
-      31,
-      137,
-      164,
-      40,
-      236,
-      146,
-      128,
-      107,
-      129,
-      59,
-      192,
-      240,
-      40,
-      238
+      39, 190, 34, 129, 208, 32, 145, 88, 191, 217, 226, 98, 183, 16, 52, 150,
+      52, 53, 31, 137, 164, 40, 236, 146, 128, 107, 129, 59, 192, 240, 40, 238
     ],
     xpub: 'FIO522SwA96CmFo2sZLuSUbhJmgHhb9reUheYCJd3JtrAnSsvGD5Z',
     key_length: 51,
@@ -779,8 +725,12 @@ export default [
       'uri address with unique identifier': [
         'fio:FIO522SwA96CmFo2sZLuSUbhJmgHhb9reUheYCJd3JtrAnSsvGD5Z?memo=123456789&memo_type=MEMO_ID',
         'FIO522SwA96CmFo2sZLuSUbhJmgHhb9reUheYCJd3JtrAnSsvGD5Z',
-        'FIO',
-        '123456789'
+        'FIO'
+      ],
+      'uri address with unique identifier and without network prefix': [
+        'FIO522SwA96CmFo2sZLuSUbhJmgHhb9reUheYCJd3JtrAnSsvGD5Z?memo=123456789&memo_type=MEMO_ID',
+        'FIO522SwA96CmFo2sZLuSUbhJmgHhb9reUheYCJd3JtrAnSsvGD5Z',
+        'FIO'
       ],
       'uri address with amount & label': [
         'fio:FIO522SwA96CmFo2sZLuSUbhJmgHhb9reUheYCJd3JtrAnSsvGD5Z?amount=1234.56789&label=Johnny%20Ripple',
@@ -852,5 +802,126 @@ export default [
         'fio:FIO522SwA96CmFo2sZLuSUbhJmgHhb9reUheYCJd3JtrAnSsvGD5Z?amount=0.00000123&label=Johnny%20Ripple&message=Hello%20World,%20I%20miss%20you%20!'
       ]
     }
+  },
+  {
+    pluginId: 'hedera',
+    WALLET_TYPE: 'wallet:hedera',
+    'Test Currency code': 'HBAR',
+    key: [
+      39, 190, 34, 129, 208, 32, 145, 88, 191, 217, 226, 98, 183, 16, 52, 150,
+      52, 53, 31, 137, 164, 40, 236, 146, 128, 107, 129, 59, 192, 240, 40, 238
+    ],
+    xpub: '302a300506032b6570032100720c6934e5c1c79a0ec8c8de809071dd8142cad11bb299d1b711de1292259b69',
+    mnemonic:
+      'chicken valve parrot park animal proof youth detail glance review artwork cluster drive more charge lunar uncle neglect brain act rose job photo spot',
+    key_length: 96,
+    'invalid key name': {
+      type: 'wallet:hedera',
+      keys: {
+        hederaKeyz: '5KG4yxR4j1S1UFk4mGraAfGrWh7TS5uiJmhtkG4vPunFWg84wuP',
+        mnemonic:
+          'chicken valve parrot park animal proof youth detail glance review artwork spot'
+      }
+    },
+    'invalid wallet type': {
+      type: 'wallet:hederax',
+      keys: {
+        hederakey:
+          'ffd3dadf65d2fb2889f3a22de0aab48691ee8a3d3e0ea8a70c2b48482a08bb68'
+      }
+    },
+    parseUri: {
+      'address only': ['0.0.443395', '0.0.443395'],
+      'invalid address': [
+        'HBARHWCM6NMEVYZKLPJBS45H5OFRVUO4KOIVBIGWZEPMZUOTHBGOL',
+        'GDUHWCM6NMEVYZKLPJBS45H5OFRVUO4KOIVBIGWZEPMZUOTHBGOL5FAD',
+        'GDUHWCM6NMEVYZKLPJBS45H5OFRVUO4KOIVBIGWZEPMZUOTHBGOL5'
+      ],
+      'uri address': ['hedera:0.0.443395', '0.0.443395'],
+      'uri address with amount': [
+        'hedera:0.0.443395?amount=12345.6789',
+        '0.0.443395',
+        '1234567890000',
+        'HBAR'
+      ],
+      'uri address with unique identifier': [
+        'hedera:0.0.443395?memo=123456789&memo_type=MEMO_ID',
+        '0.0.443395',
+        'HBAR'
+      ],
+      'uri address with unique identifier and without network prefix': [
+        '0.0.443395?memo=123456789&memo_type=MEMO_ID',
+        '0.0.443395',
+        'HBAR'
+      ],
+      'uri address with amount & label': [
+        'hedera:0.0.443395?amount=1234.56789&label=Johnny%20Ripple',
+        '0.0.443395',
+        '123456789000',
+        'HBAR',
+        'Johnny Ripple'
+      ],
+      'uri address with amount, label & message': [
+        'hedera:0.0.443395?amount=1234.56789&label=Johnny%20Ripple&msg=Hello%20World,%20I%20miss%20you%20!',
+        '0.0.443395',
+        '123456789000',
+        'HBAR',
+        'Johnny Ripple',
+        'Hello World, I miss you !'
+      ],
+      'uri address with unsupported param': [
+        'hedera:0.0.443395?unsupported=helloworld&amount=12345.6789',
+        '0.0.443395',
+        '1234567890000',
+        'HBAR'
+      ]
+    },
+    encodeUri: {
+      'address only': [
+        {
+          publicAddress: '0.0.443395'
+        },
+        '0.0.443395'
+      ],
+      'weird address': [
+        {
+          publicAddress: '0.0.443395'
+        },
+        '0.0.443395'
+      ],
+      'invalid address': [
+        { publicAddress: 'rf1GeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn' },
+        { publicAddress: 'sf1BiGeXwwQoi8Z2ueFYTEXSwuJYfV2Jpn' },
+        { publicAddress: 'rf1BiGeXwwQol8Z2ueFYTEXSwuJYfV2Jpn' }
+      ],
+      'address & amount': [
+        {
+          publicAddress: '0.0.443395',
+          nativeAmount: '123456780000'
+        },
+        'hedera:0.0.443395?amount=1234.5678'
+      ],
+      'address, amount, and label': [
+        {
+          publicAddress: '0.0.443395',
+          nativeAmount: '1230',
+          currencyCode: 'HBAR',
+          label: 'Johnny Ripple'
+        },
+        'hedera:0.0.443395?amount=0.0000123&label=Johnny%20Ripple'
+      ],
+      'address, amount, label, & message': [
+        {
+          publicAddress: '0.0.443395',
+          nativeAmount: '1230',
+          currencyCode: 'HBAR',
+          label: 'Johnny Ripple',
+          message: 'Hello World, I miss you !'
+        },
+        'hedera:0.0.443395?amount=0.0000123&label=Johnny%20Ripple&message=Hello%20World,%20I%20miss%20you%20!'
+      ]
+    }
   }
 ]
+// 302e020100300506032b657004220420ffd3dadf65d2fb2889f3a22de0aab48691ee8a3d3e0ea8a70c2b48482a08bb68
+// 302e020100300506032b657004220420906327db5cbe7ece6bf2478b907d668b99f7241c750413e4712237ee6fc68523

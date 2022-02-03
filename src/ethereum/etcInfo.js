@@ -6,15 +6,16 @@ import type {
   EdgeCurrencyInfo
 } from 'edge-core-js/types'
 
-import { imageServerUrl } from '../common/utils'
 import { makeEthereumBasedPluginInner } from './ethPlugin'
-import type { EthereumSettings } from './ethTypes.js'
+import type { EthereumFees, EthereumSettings } from './ethTypes.js'
 
-const defaultNetworkFees = {
+const defaultNetworkFees: EthereumFees = {
   default: {
+    baseFeeMultiplier: undefined,
     gasLimit: {
       regularTransaction: '21000',
-      tokenTransaction: '200000'
+      tokenTransaction: '200000',
+      minGasLimit: '21000'
     },
     gasPrice: {
       lowFee: '1000000001',
@@ -22,10 +23,13 @@ const defaultNetworkFees = {
       standardFeeHigh: '300000000001',
       standardFeeLowAmount: '100000000000000000',
       standardFeeHighAmount: '10000000000000000000',
-      highFee: '40000000001'
-    }
+      highFee: '40000000001',
+      minGasPrice: '1000000000'
+    },
+    minPriorityFee: undefined
   },
   '1983987abc9837fbabc0982347ad828': {
+    baseFeeMultiplier: undefined,
     gasLimit: {
       regularTransaction: '21002',
       tokenTransaction: '37124'
@@ -37,27 +41,31 @@ const defaultNetworkFees = {
       standardFeeLowAmount: '200000000000000000',
       standardFeeHighAmount: '20000000000000000000',
       highFee: '40000000002'
-    }
+    },
+    minPriorityFee: undefined
   },
   '2983987abc9837fbabc0982347ad828': {
+    baseFeeMultiplier: undefined,
     gasLimit: {
       regularTransaction: '21002',
       tokenTransaction: '37124'
-    }
+    },
+    gasPrice: undefined,
+    minPriorityFee: undefined
   }
 }
 
 const otherSettings: EthereumSettings = {
-  etherclusterApiServers: ['https://www.ethercluster.com/etc'],
-  etherscanApiServers: [],
+  rpcServers: ['https://www.ethercluster.com/etc'],
+  etherscanApiServers: ['https://blockscout.com/etc/mainnet'],
   blockcypherApiServers: [],
-  superethServers: [],
-  infuraServers: [],
-  isNestedInfuraParams: false,
-  infuraNeedProjectId: true,
+  blockbookServers: [],
   uriNetworks: ['ethereumclassic', 'etherclass'],
   ercTokenStandard: 'ERC20',
-  chainId: 61,
+  chainParams: {
+    chainId: 61,
+    name: 'Ethereum Classic'
+  },
   hdPathCoinType: 61,
   checkUnconfirmedTransactions: false,
   iosAllowedTokens: {},
@@ -82,7 +90,7 @@ export const currencyInfo: EdgeCurrencyInfo = {
   // Basic currency information:
   currencyCode: 'ETC',
   displayName: 'Ethereum Classic',
-  pluginName: 'ethereumclassic',
+  pluginId: 'ethereumclassic',
   walletType: 'wallet:ethereumclassic',
 
   defaultSettings,
@@ -103,8 +111,6 @@ export const currencyInfo: EdgeCurrencyInfo = {
       symbol: 'mΞ'
     }
   ],
-  symbolImage: `${imageServerUrl}/ethereum-classic-logo-solo-64.png`,
-  symbolImageDarkMono: `${imageServerUrl}/ethereum-classic-logo-solo-64.png`,
   metaTokens: [
     // Array of objects describing the supported metatokens
   ]

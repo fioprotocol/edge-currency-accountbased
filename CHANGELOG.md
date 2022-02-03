@@ -1,5 +1,470 @@
 # edge-currency-accountbased
 
+## 0.11.11 (2022-02-02)
+
+- ZEC: Fix send amount
+
+## 0.11.10 (2022-02-01)
+
+- FIO: Fix bugs with unlock dates
+- FIO: Fix bug by removing zero-amount transactions for staking actions
+
+## 0.11.9 (2022-01-28)
+
+- FIO: Add edge-core-js staking API support
+- Add ETH, FTM, MATIC and AVAX EVM-based tokens
+- Initialize walletLocalData balance when enabling tokens
+
+# 0.11.8 (2022-01-20)
+
+- ZEC: Fix to enable max spend
+- Miscellaneous cleanup: improvem logging, general refactoring and removal of dead code
+
+# 0.11.7 (2022-01-14)
+
+- ZEC: Prevent spending until engine is fully synced
+
+# 0.11.6 (2022-01-11)
+
+- Fix git URLs for dependencies
+
+# 0.11.5 (2022-01-10)
+
+- XRP: Migrate from ripple-lib to xrpl
+- ZEC: Upgrade to react-native-zcash v0.2.0
+
+# 0.11.4 (2022-01-07)
+
+- Fixed WalletConnect Rarible bug
+
+# 0.11.3 (2022-01-07)
+
+- MATIC: Add 5 more RPC servers
+
+# 0.11.2 (2022-01-06)
+
+- ETH: Add eth_signTypedData_v4 support
+
+# 0.11.1 (2022-01-06)
+
+- FIO: Replace additional network call with bundle constant
+
+# 0.11.0 (2022-01-06)
+
+- Add Avalanche (AVAX)
+- FIO: Add addBundledTransactions action
+
+# 0.10.5 (2022-01-05)
+
+- Support Wallet Connect across all ETH-like currencies
+- Add support for RenBridge Gateway address URI
+
+# 0.10.4 (2021-12-28)
+
+- XRP: Set memoMaxLength to 10
+
+# 0.10.3 (2021-12-27)
+
+- MATIC: Fix fee calculation from polygongasstation
+- MATIC: Fix default fees
+
+# 0.10.2 (2021-12-22)
+
+- Add support for multiple polygonscan api keys
+
+# 0.10.1 (2021-12-21)
+
+- Add memoMaxLength parameter to currencyInfos
+- Upgrade edge-core-js to v0.18.13
+
+# 0.10.0 (2021-12-21)
+
+- Add Polygon
+- Remove FIO name expiration
+- Update ZEC checkpoints
+
+# 0.9.3 (2021-12-10)
+
+- ZEC: Update checkpoints
+
+# 0.9.2 (2021-11-16)
+
+- ZEC: Commit Zcash checkpoints to repo
+- ETH: Remove AGLD
+
+# 0.9.1 (2021-11-11)
+
+- WalletConnect: Move connector map to global scope
+- WalletConnect: Add disconnect listener
+- ZEC: Fix getDisplayPublicSeed
+
+# 0.9.0 (2021-11-09)
+
+- Zcash: Add Zcash plugin for Android
+
+# 0.8.3 (2021-11-08)
+
+- WalletConnect: Fix fee strings
+
+# 0.8.2 (2021-11-08)
+
+- Wallet Connect Fix: Make sure that transaction methods have fee parameters
+- Wallet Connect Fix: Record the connection timestamp to include in the callback payload
+
+# 0.8.1 (2021-11-02)
+
+- Add Wallet Connect
+- ETH: Fix error handling in checkUpdateNetworkFees
+
+# 0.8.0 (2021-10-11)
+
+- Add Hedera
+
+# 0.7.76 (2021-10-04)
+
+- FIO: Always return Requests with the newest first
+- FIO: Fix off-by-one error when using splice
+
+# 0.7.75 (2021-10-02)
+
+- FIO: Fix request query logic
+
+# 0.7.74 (2021-09-27)
+
+- FIO: Remove new otherLocalData cache and use existing walletLocalData cache
+
+# 0.7.73 (2021-09-23)
+
+- FIO: Add request fetching to engine loop and save data locally
+
+# 0.7.72 (2021-09-17)
+
+- Remove postinstall-postinstall dependency
+
+# 0.7.71 (2021-08-24)
+
+- FTM: Add apikey to ftmscan.com requests
+
+# 0.7.70 (2021-08-20)
+
+- Fix: Regression caused by EIP-681 parseUri implementation
+
+# 0.7.69 (2021-08-18)
+
+- Add: Improved support for EIP-681 URI parsing of payments and token transfers
+- Fix: Unable to send transactions on ETC, FTM, and RSK networks
+
+# 0.7.68 (2021-08-02)
+
+- Add base fee multiplier ETH fee algorithm (EIP 1559)
+- Add Ethereum testnet server URIs to support testnets for development
+- Fix blockbook server URIs
+
+# 0.7.67 (2021-07-20)
+
+- Add x-address decode for xrp parse uri
+
+# 0.7.66 (2021-07-20)
+
+- Throw error if there is a checksum present and it fails verification + tests
+
+# 0.7.65 (2021-07-06)
+
+- ETH: Add checksum support
+
+# 0.7.64 (2021-07-01)
+
+- BNB: Add additional API servers
+
+# 0.7.63 (2021-06-21)
+
+- Add native fee amount to InsufficientFundsError
+- FIO: Fixed timestamps in get_actions
+
+# 0.7.62 (2021-06-08)
+
+- FIO: Randomize apiUrl when sending a new request
+
+# 0.7.61 (2021-06-03)
+
+- FIO: Add ALREADY_REGISTERED error rype
+- Prevent unnecessary fetch calls when amberdata server lists are empty
+- Remove icon URLs
+
+# 0.7.60 (2021-05-25)
+
+- Fix a possible race condition where the last queried block height is saved but the actual transactions are not
+- Always set this.walletLocalDataDirty = true if any transactions have changed
+- ETH: Use the default token gas limit if getCode reveals the destination is a contract and estimateGas fails to return a gas value
+- ETH: Allow ethgasstation safeLow estimate less than 1
+- Update logging
+
+# 0.7.59 (2021-05-25)
+
+- XRP: Remove bogus length checks from the XRP key import
+- FIO: Refactor SDK initialization so it's only started once per wallet
+
+# 0.7.58 (2021-05-12)
+
+- XRP: Change destination tag limit to 10 digits and less than UINT32
+
+# 0.7.57 (2021-05-11)
+
+- FTM: Add fUSDT support
+- XRP: Pass default fee to preparePayment
+- XRP: Remove unused 'type' field from transaction validation
+
+# 0.7.56 (2021-05-07)
+
+- Fix metadata issue for accelerated ETH txs (RBF tx)
+- Add Fantom
+
+# 0.7.55 (2021-05-03)
+
+- Remove allowance transaction filtering from addTransaction
+
+# 0.7.54 (2021-04-23)
+
+- ETH: Add error reporting to tx lists and gas price query for future debugging
+- FIO: Reduce logging verbosity
+- BNB: Enable resync
+- Upgrade edge-core-js to v0.17.31
+  - Add additional log types `crash` and `breadcrumb`
+
+# 0.7.53 (2021-04-19)
+
+- FIO: Change some error logging levels from error to info to reduce log verbosity
+
+# 0.7.52 (2021-04-12)
+
+- ETH: Add UNI ERC20 token
+- ETH: Add eth_call to token balance loop
+- FIO: Logging cleanup
+- FIO: Allow sending tokens without transactionJson or otherParams
+
+# 0.7.51 (2021-04-01)
+
+- XRP: Use default fee of (0.00001 XRP) if SDK is unable to query for recommended fee
+- Update content URL
+
+# 0.7.50 (2021-03-16)
+
+- FIO: Refactor FIO action to be passed in otherParams of edgeSpendInfo
+
+# 0.7.49 (2021-03-15)
+
+- EOS: Add dfuse graphql API to search for transactions
+- ETH: Add new Golem token GLM
+- Add promiseNy util to verify API responses from multiple sources
+- Add contract address checking to Blockbook
+
+# 0.7.48 (2021-02-26)
+
+- EOS: Add dfuse API to getKeyAccounts method
+- ETH: Double gas limit estimates when sending ETH to a contract address
+
+# 0.7.47 (2021-02-23)
+
+- ETH: Fix RBF bug: Use correct currencyCode for tx lookup in ethEngine saveTx
+- FIO: Added transfer address action
+
+# 0.7.46 (2021-02-12)
+
+- Fix variable typo
+
+# 0.7.45 (2021-02-11)
+
+- Add DeFi ERC20 tokens
+- Update FIO server list
+- Add additional logging
+
+# 0.7.44 (2021-02-02)
+
+- ETH: Bump max gas limit to 300000
+- ETH: Add additional estimateGas params that cloudflare requires
+- ETH: Put RPC error handling in multicastServers
+- ETH: Throw error when custom fee isn't valid or doesn't reach network minimums
+
+# 0.7.43 (2021-01-25)
+
+- EOS: Fix get_key_accounts endpoint and enforce 12 character rule on new account names
+- Adjust log levels
+- Update to eslint-config-standard-kit to v0.15.1
+
+# 0.7.42 (2021-01-02)
+
+- Add WBTC
+- Fix Aave token parameters
+
+# 0.7.41 (2021-01-01)
+
+- Capitalize Aave token codes
+
+# 0.7.40 (2020-12-31)
+
+- Add Aave ERC20 tokens
+- FIO: Add additional domain transfer transaction
+
+# 0.7.39 (2020-12-21)
+
+- Double gas estimate when sending ETH to a contract to reduce chance of failure
+- FIO logging cleanup
+
+# 0.7.38 (2020-12-13)
+
+- Update ANT contract address and rename original token ANTV1
+
+# 0.7.37 (2020-12-09)
+
+- EOS: Ignore bogus accounts getting returned by nodes
+
+# 0.7.36 (2020-12-07)
+
+- Remove eosrio from hyperion server list
+
+# 0.7.35 (2020-12-04)
+
+- FIO: Refactored multicast servers, add preparedTrx support, Removed non-SSL FIO servers
+- Used fetchCors for Trezor blookbook server
+
+# 0.7.34 (2020-11-23)
+
+- Add Blockbook API support for Ethereum
+- Disable Alethio API support
+- Remove Supereth API support
+
+# 0.7.33 (2020-11-18)
+
+- Fix EOSIO metaToken send issues (contractAddress and denom)
+
+# 0.7.32 (2020-11-16)
+
+- WAX changes
+  - Remove unnecessary logs and pass in token data to multiple routines
+  - Enable adding token and fetching token balance for EOSIO chains
+  - Merge in EOSIO token implementation
+  - Fix erroneous WAX activation call and publicKey typo
+
+# 0.7.31 (2020-11-11)
+
+- WAX Integration
+  - Update endpoint for finding EOSIO account by key
+  - Initial WAX integration
+  - Remove unnecessary comments and disable Greymass Fuel for Telos
+  - Enable WAX activation process
+  - Move WAX activation to eosEngine and attempt activation on engine start
+  - Adjustment to EosFuel routine
+  - Make singleApiActivation private for Wax
+- FIO changes:
+  - Check if domain is public
+  - Check for transferred addresses/domains.
+  - Transfer fio domain changes.
+  - Removed FIO str from logs.
+- RBF support for ETH, RSK, and ETH tokens
+
+# 0.7.30 (2020-10-08)
+
+- Add onAddressChanged callback to EOS to inform GUI of new account activation
+
+# 0.7.29 (2020-10-04)
+
+- Add postinstall script to npm package
+
+# 0.7.28 (2020-10-04)
+
+- Replace schema with cleaners for transaction history api calls
+- Add cloudflare rpcServer
+- Only calculate 'data' parameter if using default fees
+- Fix TRANSACTION_STORE_FILE data initialization
+- Fix hex number parsing
+- Pass fetchCors function to amberdata api calls
+- Remove unnecessary log
+- Add postinstall script for node14 dependency compatibility (usb and node-hid)
+- Update cleaners
+
+# 0.7.27 (2020-10-01)
+
+- Add FIO import private key support
+- Fix TLOS block explorer link
+
+# 0.7.25 (2020-09-18)
+
+- Upgrade FIO SDK to v1.1.0
+- Retry failed FIO tx broadcasts
+- Update FIO explorer
+
+# 0.7.24 (2020-09-16)
+
+- Add Telos (TLOS)
+- EOS fixes
+
+# 0.7.23 (2020-09-16)
+
+- FIO register domain
+- FIO check pub address error handling
+
+# 0.7.22 (2020-09-03)
+
+- Added free FIO address link
+- Updated FIO api urls to remove port
+
+# 0.7.21 (2020-09-02)
+
+- Update ETH gas price sanity check values
+
+# 0.7.20 (2020-08-25)
+
+- Add Synthetix ERC20 tokens (SNX, SBTC, and SUSD)
+- Save FIO tx fee between makeSpend() requests to the same address to reduce network calls
+- Pass parent currency code in error when there's insufficient parent currency to pay transaction fee
+- Increase timeout on network-dependent block height test
+
+# 0.7.19 (2020-08-20)
+
+- Use eth_estimategas and eth_getcode to improve ETH and ERC20 token transaction fee estimation
+
+# 0.7.18 (2020-08-12)
+
+- Disable asyncWaterfall for some FIO operations
+- Save numTransactions in localWalletData
+- Add cleaners to Etherscan get tx api responses
+
+# 0.7.17 (2020-08-04)
+
+- FIO checkTransactions algorithm update to page transactions
+- Fix REPv2 token address
+
+# 0.7.16 (2020-07-29)
+
+- Add REPV2 ERC20 token
+
+# 0.7.15 (2020-07-23)
+
+- Add new Tezos API
+- FIO - fix multicastServers
+
+# 0.7.14 (2020-07-12)
+
+- FIO fix domain reg url
+
+# 0.7.13 (2020-07-10)
+
+- Add get domains method to FIO plugin
+- FIO fallback ref mode
+- Add fee strings to ethEngine makeSpend() return value
+
+# 0.7.12 (2020-07-05)
+
+- Add Compound ERC20 token (COMP)
+
+# 0.7.11 (2020-06-25)
+
+- Update FIO apiUrls
+
+# 0.7.10 (2020-06-23)
+
+- Categorize servers by rpc and etherscan
+
 # 0.7.9 (2020-06-05)
 
 - Fix case where a FIO address could appear associated with two FIO wallets

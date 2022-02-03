@@ -3,7 +3,6 @@
 
 import { type EdgeCurrencyInfo } from 'edge-core-js/types'
 
-import { imageServerUrl } from '../common/utils'
 import { type StellarSettings } from './stellarTypes.js'
 
 const otherSettings: StellarSettings = {
@@ -18,10 +17,12 @@ export const currencyInfo: EdgeCurrencyInfo = {
   // Basic currency information:
   currencyCode: 'XLM',
   displayName: 'Stellar',
-  pluginName: 'stellar',
+  pluginId: 'stellar',
   walletType: 'wallet:stellar',
 
   defaultSettings,
+
+  memoMaxLength: 19,
 
   addressExplorer: 'https://stellarchain.io/address/%s',
   transactionExplorer: 'https://stellarchain.io/tx/%s',
@@ -34,7 +35,5 @@ export const currencyInfo: EdgeCurrencyInfo = {
       symbol: '*'
     }
   ],
-  symbolImage: `${imageServerUrl}/stellar-logo-solo-64.png`,
-  symbolImageDarkMono: `${imageServerUrl}/stellar-logo-solo-64.png`,
   metaTokens: []
 }
