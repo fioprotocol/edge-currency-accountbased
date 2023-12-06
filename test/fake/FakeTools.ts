@@ -8,14 +8,13 @@ import {
   JsonObject
 } from 'edge-core-js/types'
 
-// @ts-expect-error
-import { currencyInfo as ethInfo } from '../../src/ethereum/info/ethereumInfo'
+import { currencyInfo as fioInfo } from '../../src/fio/fioInfo'
 
 const fakeIo: any = {}
 
 export class FakeTools implements EdgeCurrencyTools {
   io: EdgeIo = fakeIo
-  currencyInfo = { ...ethInfo, pluginId: 'fakePlugin' }
+  currencyInfo = { ...fioInfo, pluginId: 'fakePlugin' }
 
   async createPrivateKey(
     walletType: string,

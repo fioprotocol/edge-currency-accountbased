@@ -152,7 +152,8 @@ export async function makeCliEngine(
         onTransactionsChanged: () => log('onTransactionsChanged'),
         onTxidsChanged: () => log('onTxidsChanged'),
         onUnactivatedTokenIdsChanged: () => log('onUnactivatedTokenIdsChanged'),
-        onWcNewContractCall: () => log('onWcNewContractCall')
+        onWcNewContractCall: () => log('onWcNewContractCall'),
+        onNewTokens: () => log('onNewTokens')
       },
       customTokens: settings.customTokens[pluginId] ?? {},
       enabledTokenIds: settings.enabledTokens[pluginId] ?? [],

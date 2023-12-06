@@ -118,25 +118,6 @@ for (const fixture of fixtures) {
       assert.equal(parsedUri.nativeAmount, undefined)
       assert.equal(parsedUri.currencyCode, undefined)
     })
-    if (fixture.parseUri['checksum address only'] != null)
-      it('checksum address only', async function () {
-        const parsedUri = await tools.parseUri(
-          // @ts-expect-error
-          fixture.parseUri['checksum address only'][0]
-        )
-        assert.equal(
-          parsedUri.publicAddress,
-          // @ts-expect-error
-          fixture.parseUri['checksum address only'][1]
-        )
-      })
-    if (fixture.parseUri['invalid checksum address only'] != null)
-      it('invalid checksum address only', async function () {
-        return await expectRejection(
-          // @ts-expect-error
-          tools.parseUri(fixture.parseUri['invalid checksum address only'][0])
-        )
-      })
     it('invalid address', async function () {
       return await expectRejection(
         tools.parseUri(fixture.parseUri['invalid address'][0])
@@ -324,14 +305,12 @@ for (const fixture of fixtures) {
     })
     it('address only', async function () {
       const encodedUri = await tools.encodeUri(
-        // @ts-expect-error
         fixture.encodeUri['address only'][0]
       )
       assert.equal(encodedUri, fixture.encodeUri['address only'][1])
     })
     it('weird address', async function () {
       const encodedUri = await tools.encodeUri(
-        // @ts-expect-error
         fixture.encodeUri['weird address'][0]
       )
       assert.equal(encodedUri, fixture.encodeUri['weird address'][1])
@@ -353,14 +332,12 @@ for (const fixture of fixtures) {
     })
     it('address & amount', async function () {
       const encodedUri = await tools.encodeUri(
-        // @ts-expect-error
         fixture.encodeUri['address & amount'][0]
       )
       assert.equal(encodedUri, fixture.encodeUri['address & amount'][1])
     })
     it('address, amount, and label', async function () {
       const encodedUri = await tools.encodeUri(
-        // @ts-expect-error
         fixture.encodeUri['address, amount, and label'][0]
       )
       assert.equal(
@@ -370,7 +347,6 @@ for (const fixture of fixtures) {
     })
     it('address, amount, label, & message', async function () {
       const encodedUri = await tools.encodeUri(
-        // @ts-expect-error
         fixture.encodeUri['address, amount, label, & message'][0]
       )
       assert.equal(

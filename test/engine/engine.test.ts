@@ -79,6 +79,9 @@ for (const fixture of fixtures) {
     },
     onWcNewContractCall(payload) {
       emitter.emit('wcNewContractCall', payload)
+    },
+    onNewTokens() {
+      console.log('onNewTokens')
     }
   }
 
@@ -188,31 +191,9 @@ for (const fixture of fixtures) {
   })
 
   describe('Message signing', function () {
-    if (fixture.messages == null) return
-    it('Should sign a hashed message', async function () {
-      if (engine == null) throw new Error('ErrorNoEngine')
-      if (engine.signMessage == null) return
-      const sig = await engine.signMessage(
-        fixture.messages.eth_sign.param,
-        privateWalletInfo.keys,
-        {}
-      )
-      assert.equal(sig, fixture.messages.eth_sign.signature)
-    })
-    it('Should sign a typed message', async function () {
-      if (engine == null) throw new Error('ErrorNoEngine')
-      if (engine.signMessage == null) return
-      const sig = await engine.signMessage(
-        JSON.stringify(fixture.messages.eth_signTypedData.param),
-        privateWalletInfo.keys,
-        {
-          otherParams: {
-            typedData: true
-          }
-        }
-      )
-      assert.equal(sig, fixture.messages.eth_signTypedData.signature)
-    })
+    if (fixture.messages == null) {
+      console.log('Sjip Message signig for FIO plugin')
+    }
   })
 
   describe('Stop the engine', function () {
@@ -265,6 +246,9 @@ const callbacks: EdgeCurrencyEngineCallbacks = {
   },
   onWcNewContractCall(payload) {
     emitter.emit('wcNewContractCall', payload)
+  },
+  onNewTokens() {
+    console.log('onNewTokens')
   }
 }
 

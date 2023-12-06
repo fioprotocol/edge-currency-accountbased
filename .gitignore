@@ -5,7 +5,6 @@
 /android/src/main/assets/edge-currency-accountbased/
 /cli/.storage/
 /dist/
-/lib/
 /scripts/cosmos-ts-protos/tmp
 
 # Package managers:
