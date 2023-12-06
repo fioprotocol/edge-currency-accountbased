@@ -8,6 +8,7 @@ import {
   JsonObject
 } from 'edge-core-js/types'
 
+// @ts-expect-error
 import { currencyInfo as fioInfo } from '../../src/fio/fioInfo'
 
 const fakeIo: any = {}
