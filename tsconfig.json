@@ -9,7 +9,8 @@
     "target": "es2015",
     "skipLibCheck": true,
 
-    "strict": true
+    "strict": true,
+    "types": []
   },
   "exclude": ["lib", "bin", "scripts/cosmos-ts-protos/tmp"]
 }
