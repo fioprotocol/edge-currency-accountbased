@@ -1,5 +1,893 @@
 # edge-currency-accountbased
 
+## Unreleased
+
+## 2.17.0 (2023-12-04)
+
+- added: (Solana) Add SPL token support
+- added: (Osmosis) Add ION token
+- added: (Cosmos-based) Add token spending
+- added: Missing RUNE symbol
+- added: Cosmos getMaxTx method
+
+## 2.16.0 (2023-12-01)
+
+- added: Coreum (COREUM)
+- added: Osmosis (OSMO)
+- added: Goerli tokens and Pokt RPC server
+- added: Notify core of new detected token balances
+- changed: Upgrade edge-core-js to 1.12.0
+- changed: (Cosmos-based) Use gas limit estimation for fees
+- changed: (Cosmos-based) Use both archive and validator nodes to optimize requests
+- changed: (Cosmos-based) Replace `transfer` with `coin_received` and `coin_spent` events for transaction processing
+
+## 2.15.0 (2023-11-30)
+
+- added: EVM memo options for FEVM currencies
+- added: WFIL and iFIL tokens to FEVM currencies
+- fixed: Token balance query in RpcAdapter had missing 'pending' parameter
+- fixed: Filecoin f4 address parsing
+
+## 2.14.0 (2023-11-24)
+
+- added: Add Pokt RPCs as option for Fantom and Polygon
+- added: Avascan replaces snowtrace as an evmScan server and explorer for Avalanche
+
+## 2.13.1 (2023-11-21)
+
+- fixed: Incorrect deposit alias for Thorchain RUNE
+
+## 2.13.0 (2023-11-20)
+
+- added: Add `MakeTxDeposit` to support THORChain swap transactions
+- added: ENS name resolution support
+- changed: Move `makeTx` params types to common
+- changed: (RUNE) Replace shapeshift api with native rpc tx query
+- fixed: Possible error in ETH transactions when calculated gasPrice is below baseFee
+
+## 2.12.0 (2023-11-14)
+
+- added: Filecoin FEVM
+- added: Filecoin FEVM Testnet (Calibration)
+- added: Filecoin wallets can send to 0x addresses for FEVM interop
+- fixed: Removed unsafeBroadcastTx configuration for Filecoin
+
+## 2.11.2-tc2 (2023-11-21)
+
+- fixed: Incorrect deposit alias for Thorchain RUNE
+
+## 2.11.2-tc (2023-11-20)
+
+- added: Add `MakeTxDeposit` to support THORChain swap transactions
+- changed: Move `makeTx` params types to common
+- changed: (RUNE) Replace shapeshift api with native rpc tx query
+- fixed: Possible error in ETH transactions when calculated gasPrice is below baseFee
+
+## 2.11.2 (2023-11-13)
+
+- fixed: EVM balance sync failure if missing API key for one node type
+
+## 2.11.1 (2023-11-10)
+
+- fixed: Use transaction type 0 (legacy transactions) currencies which do no support EIP-1559
+
+## 2.11.0 (2023-11-08)
+
+- added: Add THORChain (RUNE)
+- added: (Polygon) Add native USDC
+- changed: (Piratechain) Restart the synchronizer during initial sync if it stops providing status updates
+- changed: (Polygon) Update bridged USDC currency code to USDC.e
+
+## 2.10.0 (2023-11-07)
+
+- added: Add a `yarn cli` command for debugging and testing plugins from the command line.
+- added: Batch balance query via smart contract
+
+## 2.9.4 (2023-11-06)
+
+- changed: Transactions for currencies which support EIP1559 will be sent with EIP1559 fee parameters
+- fixed: Corrected token address for PYUSD on Ethereum to be the proxy contract
+
+## 2.9.3 (2023-11-03)
+
+- fixed: (Piratechain) alias format from base64 to base16
+
+## 2.9.2 (2023-11-02)
+
+- changed: (Piratechain) Use walletId as synchronizer alias
+
+## 2.9.1 (2023-11-01)
+
+- fixed: EdgeTxActionSwap direction parsing for XRP transactions
+
+## 2.9.0 (2023-10-25)
+
+- added: Parse XRP DEX orders into EdgeTxActions
+
+## 2.8.2 (2023-10-25)
+
+- fixed: Filecoin `getMaxSpendable` fee race conditions are resolved by caching the max-spend parameters.
+- fixed: Filecoin resync bugs
+
+## 2.8.1 (2023-10-24)
+
+- fixed: Provide working type definitions for this library.
+
+## 2.8.0 (2023-10-23)
+
+- added: Filecoin Testnet (Calibration)
+- changed: Improved Filecoin transaction syncing
+- fixed: Missing Filecoin transactions caused by external messages for the account (e.g. FILForwarder)
+
+## 2.7.2 (2023-10-20)
+
+- added: Add deprecated `memoType` to zcashInfo for backwards compatibility
+- fixed: Account for possible 0-date transaction listerner race-condition
+- fixed: Filecoin returns a more stable spendable balance from `getMaxSpendable`
+- fixed: More accurate Filecoin fee estimation for `makeSpend`
+
+## 2.7.1 (2023-10-16)
+
+- changed: Upgrade react-native-zcash to v0.6.2
+- changed: Update address explorer url (Zcash)
+- fixed: Set synchronizer to null in `killEngine` so it can be properly restarted (Zcash)
+
+## 2.7.0 (2023-10-11)
+
+- added: EdgeTxAction tagging to TRX freeze/unfreeze contract call transactions
+- added: Support for importing XLM wallets via 12/24-word mnemonic seed phrase
+- added: Add Zcash autoshield support
+- changed: Use Zcash types directly from react-native-zcash
+
+## 2.6.0 (2023-10-09)
+
+- changed: Upgrade react-native-piratechain to v0.4.0
+
+## 2.5.5 (2023-10-06)
+
+- fixed: Switch Filecoin to a working block explorer (Filfox).
+
+## 2.5.4 (2023-10-02)
+
+- fixed: Max spend for XLM
+
+## 2.5.3 (2023-09-27)
+
+- added: Tron `WithdrawExpireUnfreeze` transaction support
+- added: Add VELO v2 token
+
+## 2.5.2 (2023-09-22)
+
+- removed: Temporarily disable non-functionaly zcash memos, pending an updated SDK with correct fee math.
+
+## 2.5.1 (2023-09-21)
+
+- changed: Update Zcash address explorer
+- fixed: Rename Tron memos to "note".
+
+## 2.5.0 (2023-09-20)
+
+- changed: Remove the maximum memo length on Tron
+- changed: Upgrade react-native-zcash to v0.5.0
+- changed: Update Zcash address explorer
+- fixed: Use EdgeMemo for WalletConnect data payloads
+- fixed: Do not crash if BigInt is not present
+- fixed: Block Filecoin when BigInt is not present
+
+## 2.4.1 (2023-09-14)
+
+- changed: Update react-native-zcash to v0.4.2
+- fixed: Fixed Zcash transaction memos array handling
+- fixed: Add `0x` prefix to EVM data created outside the engine
+- fixed: Roundup fee nativeAmount returned from L1 so it is an integer
+
+## 2.4.0 (2023-09-13)
+
+changed: Upgrade react-native-zcash to v0.4.1
+changed: Split Zcash and Piratechain into their own engines and tools
+changed: Update Pulsechain explorer URL
+removed: Disabled all Piratechain synchronizer functionality. This is a temporary removal due to incompatibility between latest react-native-zcash and react-native-piratechain. Engine will still load but it only useful for retrieving private keys.
+
+## 2.3.0 (2023-09-12)
+
+- added: Support the latest core memo API's.
+
+## 2.2.5 (2023-09-21)
+
+- fixed: Do not crash if BigInt is not present.
+- fixed: Block Filecoin when BigInt is not present.
+
+## 2.2.4 (2023-09-08)
+
+- fixed: Bug prevent Filecoin spend transactions from being saved in the wallet (by saveTx)
+- fixed: Filecoin network fee query issue
+- changed: Use Filfox exclusively for Filecoin transaction querying
+- fixed: Incorrectly identifying send-to-self transactions as receives from the network
+- added: USDT token to Avalanche
+- added: PYUSD token to Ethereum
+
+## 2.2.3 (2023-09-07)
+
+- added: Integrate Filfox for Filecoin transaction scanning
+
+## 2.2.2 (2023-09-06)
+
+- changed: Revert usage of `queryMulti` in Polkadot engine balance query
+
+## 2.2.1 (2023-09-04)
+
+- changed: Use separate code path for calculating token max spendable (Polkadot)
+- changed: Allow user to spend entire token balance (Polkadot)
+- changed: Add early exit to transaction query (Polkadot)
+- fixed: Use Filscan as the block explorer for Filecoin
+- fixed: Used correct balance in when sending tokens (Polkadot)
+- fixed: Update Liberland length fee cost
+
+## 2.2.0 (2023-09-04)
+
+- added: Add new ETH tokens ARB, BUSD, and PAXG
+- added: Add new BSC token BUSD
+- added: Add new RPC server, Pocket Network
+- changed: Parameterize apikey replacement in node urls and remove url-specific apikey logic in engines
+- fixed: Skip Liberland transaction history query if subscan url isn't present
+- fixed: Correctly report transaction history query status for new empty Filecoin wallets
+
+## 2.1.0 (2023-08-29)
+
+- added: Add a Liberland plugin.
+- added: Add a Filecoin plugin.
+- fixed: Use the correct sign on Ripple transactions.
+
+## 2.0.0 (2023-08-28)
+
+- changed: Replace deprecated display key and token methods with modern ones.
+- changed: Require edge-core-js v0.21.2 or higher.
+
+## 1.5.2 (2023-08-24)
+
+- fixed: Correctly parse more types of Ripple transactions, including DEX transactions.
+
+## 1.5.1 (2023-08-23)
+
+- changed: Removed blockscout API server from ETC info (disabling transaction list retrieval)
+
+## 1.5.0 (2023-08-14)
+
+- added: Support for XRP OfferCreate txs
+- added: Fantom tokens listed on Axelarscan (AXLUSDC, AXLUSDT, AXLETH, AXLWBTC)
+-
+
+## 1.4.12 (2023-08-11)
+
+- Fixed: Bug in FIO causing missing historical transactions (first page of transactions).
+- Fixed: Improve FIO transaction history fetching from history nodes by using the nodes with the highest action sequence number.
+
+## 1.4.11 (2023-07-30)
+
+- fixed: Use `io.fetchCors` for all requests, instead of `io.fetch`.
+
+## 1.4.10 (2023-07-27)
+
+- fixed: Replace asMaybe and asOptional cleaner default objects with functions that return new objects in otherData cleaners
+
+## 1.4.9 (2023-07-26)
+
+- changed: Update XRP explorer url
+- changed: Update checkpoints
+
+## 1.4.8 (2023-07-21)
+
+- Optimism: Replace deprecated rpc method `rollup_gasPrices` with `l1BaseFee` query
+- EVM: Handle null gas parameter in WalletConnect requests
+- Update checkpoints
+
+## 1.4.7 (2023-07-18)
+
+- FIO: Treat 403 status code as error
+- Update checkpoints
+
+## 1.4.6 (2023-07-14)
+
+- Fixed: FIO transaction reliability issues resolved by adding more historical nodes
+
+## 1.4.5 (2023-07-12)
+
+- Update GALA token
+- Remove EthGasStation test
+- Update checkpoints
+
+## 1.4.4 (2023-06-30)
+
+- Fixed: Critical bug that is missing data field for native EVM transactions including a memo
+
+## 1.4.3 (2023-06-27)
+
+- Disable using TRX for PIX codes
+
+## 1.4.2 (2023-06-21)
+
+- Upgrade @polkadot/api to v10.9.1
+
+## 1.4.1 (2023-06-21)
+
+- Fixed: Fixed Ethereum broken max-spend for spend info with undefined nativeAmount
+
+## 1.4.0 (2023-06-20)
+
+- Added: Add PulseChain (PLS)
+
+## 1.3.1 (2023-06-20)
+
+- Fixed: Fix broken max-spend for zkSync
+
+## 1.3.0 (2023-06-20)
+
+- Deprecate WalletConnect v1
+- EVM/ALGO: Add parseWalletConnectV2Payload to parse out amounts from WalletConnect v2 payloads
+- ZEC: Update checkpoints
+
+## 1.2.13 (2023-06-02)
+
+- FIO: Fix unstake method insufficient funds checking
+
+## 1.2.12 (2023-06-02)
+
+- FIO: Change `getMaxSpendable` to use available balance
+- Update ZEC/ARRR checkpoints
+
+## 1.2.11 (2023-06-01)
+
+- EVM: Re-enable token transaction acceleration
+- FIO: Add `getMaxSpendable`
+- TRX: Fix memo handling
+
+## 1.2.10 (2023-05-30)
+
+- Fixed: Added transaction processing for FIO name registration actions
+
+## 1.2.9 (2023-05-23)
+
+- FIO: Handle empty otherParams objects as null
+
+## 1.2.8 (2023-05-23)
+
+- Add Pepe token
+- Update ZEC/ARRR checkpoints
+
+## 1.2.7 (2023-05-17)
+
+- Tron: Pass nativeAmount directly to TRC20 encoder
+- Tron: Make fee optional in asTRC20TransactionInfo cleaner
+
+## 1.2.6 (2023-05-16)
+
+- EVM: Fix null gas price handling in txRpcParamsToSpendInfo
+- Ripple: Fix api reconnect logic
+
+## 1.2.5 (2023-05-10)
+
+- Fixed: Find XLM memos in all three makeSpend API locations
+
+## 1.2.4 (2023-05-09)
+
+- ZEC/ARR: Add import private key birthdayHeight option handling
+- FIO: Replace public key with recipient public key
+- Rename files to the network name, not the currency code
+- Use uppercase names for files that export classes and use loweracse names for files that export types and utilities
+
+## 1.2.3 (2023-05-08)
+
+- Fix: Precision bug in min gas price checks for EVM currencies
+- Change: Lower zkSync minGasPrice to 0.01 gwei
+- Removed non-checksum addresses for EVM-based currencies (legacyAddress)
+- Fix: Added dynamic gas limit calculation for zkSync
+- Add Tron Stake v2
+- Algorand: Support signing multiple transactions in wallet connect request
+
+## 1.2.2 (2023-05-01)
+
+- FIO: Update node list
+
+## 1.2.1 (2023-05-01)
+
+- ZEC/ARRR: Prevent sending overlapping queries to synchronizer
+- Fix accessing already deleted wallet connector
+- ZEC/ARRR: Update checkpoints
+
+## 1.2.0 (2023-04-24)
+
+- Add WalletConnect v1 support to Algorand
+- Update EVM WalletConnect call_request response to include nativeAmount and networkFee
+- Break out WalletConnect types to common folder
+- Update ZEC checkpoints
+
+## 1.1.1 (2023-04-24)
+
+- fixed: Parse URIs as Tron addresses first before PIX addresses to prevent incorrect parsing of Tron addresses as a PIX address
+
+## 1.1.0 (2023-04-20)
+
+- Added: ERC-55 checksum address returned by `getFreshAddress` for ethereum plugin
+
+## 1.0.1 (2023-04-24)
+
+- fixed: Parse URIs as Tron addresses first before PIX addresses to prevent incorrect parsing of Tron addresses as a PIX address
+
+## 1.0.0 (2023-04-19)
+
+- PIX: Support minimum amount
+- ETH: Add ERC20 tokens (Amp, ApeCoin, Cronos Coin, EnjinCoin, Gala, Game Coin, Graph Token, Healthcare Administration Token, LoopringCoin V2, PlayDapp Token, Quant, SAND, SHIBA INU, Strike Token, SUKU, and Wrapped FIO)
+- FIO: Fix new account balance object
+- Audit and fix noisy unused address logging
+- HBAR/EOS: Fix balance and tx query for new accounts
+- Upgrade edge-core-js to v0.21.0
+- Replace asMaybe and asOptional cleaner default objects with functions that return new objects
+- Upgrade cleaners to v0.3.14
+
+## 0.24.2 (2023-04-17)
+
+- Add zkSync wallet type
+
+## 0.24.1 (2023-04-13)
+
+- EVM: Update node lists
+- ZEC/ARRR: Update checkpoint files
+
+## 0.24.0 (2023-04-10)
+
+- Add Algorand (ALGO)
+- OP: Add WETH and VELO tokens
+- BNB Beacon Chain: Fix transaction date handling
+- ARRR: Add `unsafeBroadcastTx` to info
+- EVM: Query info server fees by pluginId
+- EVM: Save network fees to engine rather than to disk
+
+## 0.23.2 (2023-04-04)
+
+- FIO: Fix syncNetwork private key handling
+- FIO: Use promiseNy for balance checking
+- FIO: Fix promiseNy error handling
+- EVM: Update node lists
+- ZEC/ARRR: Update checkpoint files
+
+## 0.23.1 (2023-04-04)
+
+- fixed: Crash in `createPrivateKey` for `EosTools`
+
+## 0.23.0 (2023-03-28)
+
+- Refactor FIO use makeSpend, signTx, and broadcastTx instead of ambiguous otherMethods
+- changed: Remove `wcRequestResponse` and all WalletConnect signing methods
+- added: Support for `signMessage` core API for Ethereum engines to be used for Wallet Connect integrations
+- changed: Refactor all engines to only deal with private keys directly from privileged functions
+
+## 0.22.21 (2023-03-21)
+
+- Fix fallback value returned when recipient min balance check fails
+- XRP: Add additional broadcast error code handling
+
+## 0.22.20 (2023-03-20)
+
+- EOS: Fix address parsing
+- EOS: Replace address regex with greymass sdk regex
+
+## 0.22.19 (2023-03-10)
+
+- removed: Do not use `EdgeCurrencyInfo.defaultSettings` to store network info for most chains.
+- changed: Upgrade EOS to have power-up support. This will make spending EOS work again.
+- changed: Do not allow sending funds to XRP or Polkadot addresses if they would fail to meet activation the reserve requirement.
+
+## 0.22.18 (2023-03-10)
+
+- fixed: Lower Optimism minGasPrice
+
+## 0.22.17 (2023-03-09)
+
+- changed: Update HBAR explorer URL
+
+## 0.22.16 (2023-03-08)
+
+- added: Parse/quote Smartpay PIX QR codes for Tron/USDT
+
+## 0.22.15 (2023-03-08)
+
+- EVM: Add L1 gas price multiplier
+
+## 0.22.14 (2023-03-02)
+
+- EVM: Fix nativeAmount calculation when paying an L1 fee
+- Add optional checkEnvironment method to OuterPlugin to allow a plugin to fail after loading and during initialization
+- Update checkpoint files
+
+## 0.22.13 (2023-02-23)
+
+- EVM: Fix race condition of undefined balance for ETH-based currencies
+- ARRR: Update checkpoint files
+
+## 0.22.11-1 (2023-02-21)
+
+- EVM: Fix hex to decimal conversion in eth_call
+
+## 0.22.12 (2023-02-17)
+
+- added: Add Optimism currency plugin.
+- changed: Loosen restrictions on custom token currency codes.
+
+## 0.22.11 (2023-02-17)
+
+- fixed: Correctly report ETHW balances.
+
+## 0.22.10 (2023-02-15)
+
+- Fix: Include per token reserve in calculation of getMaxSpendable and makeSpend
+- Add: Built in tokens for BSC, ETHW, and ETC to allow for custom tokens
+
+## 0.22.9 (2023-02-14)
+
+- Fix: Missing XRP token transactions
+
+## 0.22.8 (2023-02-10)
+
+- Improve `hexToDecimal` safety
+
+## 0.22.7 (2023-02-07)
+
+- Fix: BNB Beacon Chain missing setOtherData method causing login errors
+
+## 0.22.6 (2023-02-07)
+
+- TRX: Add bandwidth and energy staking support
+
+## 0.22.5 (2023-02-06)
+
+- Add XRP token support
+- Add native `builtinTokens` support and deprecate `metaTokens`
+- Use patch-package to fix @tronscan/client errors
+
+## 0.22.4 (2023-02-01)
+
+- TRX: Fix resource handling
+- TRX: Fix fee calculation for low value transactions
+- Update checkpoint files
+
+## 0.22.3 (2023-01-30)
+
+- fixed: Adjust build settings to provide better support for iPhone 12.
+- fixed: Track EVM wallet connections at the EdgeCurrencyTools level, to prevent active connections from disappearing.
+
+## 0.22.2 (2023-01-20)
+
+- TRX: Add note support
+- TRX: Update derivation path to industry standard
+- EVM: Revert `getMaxSpendable` simplification changes in favor of recursion due to sliding standard fee scale
+- HBAR: Update explorer urls
+- DOT: Update @polkadot/api to v9.11.3
+- DOT: Improve type safety and various code cleanups
+
+## 0.22.1 (2023-01-17)
+
+- XRP: Replace use of `autofill` with local transaction creation
+- XRP: Replace currency settings with networkInfo
+- XRP: Clean up code for type-safety
+- XRP: Add broadcast failure handling
+- Replace forked ethereumjs-wallet library
+- Remove ethereumjs-util resolution
+- Cleanup old and redundant dependency resolutions
+- ARRR: Remove address explorer url
+
+## 0.22.0 (2023-01-11)
+
+- Convert library to React Native Module
+  - This package will automatically install itself using React Native autolinking and no longer requires Webpack for integration
+  - Plugins are broken out and can be loaded individually
+  - Move checkpoint files to android folder
+  - Stub away unwanted USB modules
+- ZEC: Update checkpoints
+- ARRR: Update checkpoints
+
+## 0.21.2 (2023-01-10)
+
+- EOS: Fix destructure error when attempting to spend
+- EVM: Remove recursion from `getMaxSpendable`
+- Replace remaining json-schema usage with cleaners
+- DOT: Add hard limit of 1 to transaction query progress
+
+## 0.21.1 (2022-12-27)
+
+- Changed: Implement accelerate transaction feature using new core API
+
+## 0.21.0 (2022-12-20)
+
+- Add Piratechain (ARRR)
+- ZEC: Add getBirthdayHeight plugin method
+- Revamp checkpoint creation script to query treestate directly from lightwalletd nodes
+- Upgrade react-native-zcash to v0.3.2
+
+## 0.20.5 (2022-12-15)
+
+- TRX: Make sure to check the total native asset cost in makeSpend
+- FIO: Update server list
+
+## 0.20.4 (2022-12-15)
+
+- EVM: Only cache gas limit if retrieved from network
+- EVM: Fail makeSpend for contract transactions if unable to estimate gas limit
+- EVM: Rework gasLimit calculation to double any estimate for transaction that interacts with a contract
+
+## 0.20.3 (2022-12-14)
+
+- Update default Polygon BUSD address from Paxos (0xdab529f40e671a1d4bf91361c21bf9f0c9712ab7) to Binance (0x9c9e5fd8bbc25984b178fdce6117defa39d2db39)
+- TRX: Fix missing timestamp on broadcasted transactions
+
+## 0.20.2 (2022-12-07)
+
+- ETH: Add new KNC token and rename old token to KNCV1
+
+## 0.20.1 (2022-12-07)
+
+- Fix Ethereum and builtin token handling
+- Various code cleanups
+
+## 0.20.0 (2022-12-02)
+
+- Lay ground work for future dynamically imported currencies by breaking plugins into 'inner' and 'outer' portions
+  - 'outer' plugins contain currency details, network info, and list to optional plugin methods
+  - 'inner' plugins contain heavy lifting code to create wallets and interact with networks
+- TRX: Fix walletType check in `derivePublicKey`
+- Various code cleanups
+
+## 0.19.0 (2022-12-01)
+
+- Add Tron (TRX) with TRC20 token support
+- Fix `getTokenId` logic error
+- Fix balance checking in `makeSpendCheck`
+- Rename Plugin to Tools
+- Make URI helpers standalone
+- Add type definitions for core globals and third-party modules
+- Various code cleanups
+
+## 0.18.10 (2022-11-21)
+
+- AVAX: Add USDC token
+- Extend makeSpend to support token amount metadata for smart-contract calls
+
+## 0.18.9 (2022-11-15)
+
+- Fix Travis builds
+- Fix prepare scripts
+- Make Polkadot types visible in Typescript
+- Enable remaining ESLint rule
+
+## 0.18.8 (2022-10-31)
+
+- ZEC: Throw error when attempting to send before wallet is synced
+- ZEC: Update checkpoints
+
+## 0.18.7 (2022-10-19)
+
+- EVM: Split up eth_getTransactionCount into separate evmscan and rpc methods
+
+## 0.18.6 (2022-10-18)
+
+- ETH: Add Origin (OGN)
+- EVM: Add RPC balance query
+- EVM: Return empty transaction arrays if evmscan server list is empty
+
+## 0.18.5 (2022-10-14)
+
+- CELO: Fix server url
+- ZEC: Update checkpoints
+
+## 0.18.4 (2022-10-03)
+
+- BNB: Fix transaction amount and fee denomination
+- ZEC: Update checkpoints
+
+## 0.18.3 (2022-09-30)
+
+- XLM: Add dynamic fee support
+- EVM: Fix broken baseFee from accidental boolean coercion
+- SOL: Update explorer URLs
+
+## 0.18.2 (2022-09-27)
+
+- BNB: Fix Beacon Chain transaction processing
+- Fix parseUriCommon protocol parsing
+- CELO: Update server list
+- ZEC: update checkpoints
+
+## 0.18.1 (2022-09-20)
+
+- Fix broken biggystring import
+- ZEC: update checkpoints
+
+## 0.18.0 (2022-09-19)
+
+- Convert project to Typescript
+- Upgrade @polkadot/api to v9.3.3
+
+## 0.17.7 (2022-09-07)
+
+- ETH: Fix spending with empty memo field
+- FTM: Add L3USD token
+- Update ZEC checkpoints
+
+## 0.17.6 (2022-09-06)
+
+- Allow EVM data to be passed through memo field
+- Rename engine.js:makeSpend to makeSpendCheck since it has a different return signature than the asset specific makeSpend
+- Restore internal transaction support for etherscan providers. Remove transaction queries from blockbook providers since they don't support internal txs
+- Fix broken ethEngine skipChecks
+
+## 0.17.5 (2022-08-23)
+
+- Implement new `skipChecks` and `pendingTxs` API from `EdgeSpendInfo` for ETH engines
+- Allow specifying only gasPrice or gasLimit for custom fees
+
+## 0.17.4 (2022-08-18)
+
+- Remove useless broken dependencies usb and node-hid before building
+- ZEC: update checkpoint script and checkpoint files
+- FIO: Update server list
+
+## 0.17.3 (2022-08-18)
+
+- Fix blockbook query txs return object initialization
+- Only record parent network fee on outgoing transactions
+- ETH: Update blockbook server list
+- XRP: Fix API disconnect
+- ETH: Add NOW Token
+- Remove unused values from transactions
+
+## 0.17.2 (2022-07-29)
+
+- DOT: Fix sent native amount
+- DOT: Fix regression in new wallet syncing
+
+## 0.17.1 (2022-07-28)
+
+- DOT: Fix txCount in `queryTransactions`
+- DOT: Reorder operations in `queryTransactions` to reduce callback usage, retry failed queries, and reduce logging
+
+## 0.17.0 (2022-07-27)
+
+- Add Polkadot (DOT)
+
+## 0.16.4 (2022-07-13)
+
+- FTM: Add new default tokens: AVAX, BNB, BTC, CRV, DAI, ETH, FUSD, LIF3, LINK, LSHARE, MIM, TREEB, ZOO
+- ETH: Calculate and store feeRateUsed in transactions
+
+## 0.16.3 (2022-07-04)
+
+- ETH: Fix network fee calculation
+
+## 0.16.2 (2022-06-30)
+
+- Add: All AAVE token for kovan
+- Change: Rename PAX token to USDP for ethereum
+
+## 0.16.1 (2022-06-10)
+
+- ETH: Break out testnets into their own plugins
+- ZEC: Upgrade react-native-zcash to v0.2.2
+- ETH: Remove internal transaction queries
+
+## 0.16.0 (2022-05-19)
+
+- Remove the enabledTokens from the cached data (walletLocalData) and filter unknown tokens out
+
+## 0.15.11 (2022-05-14)
+
+- Remove RPC node that returns false zero balances
+
+## 0.15.10 (2022-05-12)
+
+- Add `getTokenId` to ethereum and eos plugins
+- Upgrade edge-core-js to v0.19.15
+- Upgrade @binance-chain/javascript-sdk to v4.2.0
+- Replaced eos `checkAddress` internal loop with regex
+- Fix XRP `disconnect` method
+- Fix tests
+  - Fix plugin imports
+  - Always initialize FIO sdk with a baseUrl
+  - Fix FTM network fees test
+  - Fix ftmInfo.js filename
+  - Add timeout to getSupportedCurrencies test to prevent hanging
+
+## 0.15.9 (2022-05-04)
+
+- ETH: Round gas price values to ints before converting to hex
+
+## 0.15.8 (2022-05-03)
+
+- ETH: Fix initial local network fees assignment
+- ETH: Merge info server fees response with local data instead of overwriting
+- ETH: Prioritize the queried minGasLimit and minGasPrice over the default values
+
+## 0.15.7 (2022-05-02)
+
+- Fix assignment of network fees from info server
+- Add logging of fees
+- Add feeUpdateFrequency override and change FTM to 1 min
+- Change preference of fee providers
+- Do not overwrite baseFeeMultiplier coming from settings
+- Fix hex number handling
+- Update ZEC checkpoints
+
+## 0.15.6 (2022-04-22)
+
+- Add MAI token (miMATIC) to FTM (Fantom)
+
+## 0.15.5 (2022-04-14)
+
+- EOS/TLOS/WAX: Remove parent currency from metaTokens array
+
+## 0.15.4 (2022-04-13)
+
+- Add blockbook broadcast method
+- Fix networkFees object initialization on resync
+- Fix `checkTxsBlockbook` so it doesn't break on unused addresses
+- Reduce some duplicate blockbook code
+- Update ZEC checkpoints
+
+## 0.15.3 (2022-04-08)
+
+- Use a reliable FTM RPC-nodes
+
+## 0.15.2 (2022-04-08)
+
+- Fix Bug in EVM fees
+
+## 0.15.1 (2022-03-08)
+
+- Add backwards-compatible apikey helper function
+
+## 0.15.0 (2022-03-08)
+
+This is a breaking release that changes EthereumInitOptions variable names:
+
+- Api keys for etherscan-like data sources are now called `evmScanApiKey` (was `bscscanApiKey`, `ftmscanApiKey`, etc.)
+- Api keys for ethgasstation-like data sources are now called `gasStationApiKey` (was `ethGasStationApiKey`)
+
+Other updates:
+
+- Add etherscan fee sources across EVM chains
+- FTM: Add new tokens WFTM, TSHARE, TOMB, TBOND, and xBOO
+- FTM: Add additional rpc servers
+- Update ZEC checkpoints
+- Upgrade edge-core-js to v0.19.10
+  - added: `EdgeCurrencyInfo.canReplaceByFee`
+
+## 0.14.1 (2022-02-23)
+
+- Update BNB chain display names
+- Update ZEC checkpoints
+
+## 0.14.0 (2022-02-18)
+
+- Add Binance Smart Chain (BNB) support
+- Add getSplittableTypes method to ethEngine
+
+## 0.13.1 (2022-02-15)
+
+- Add Celo support
+- Use binary search in ethEngine's `getMaxSpendable` for main chain currency code
+
+## 0.12.2 (2022-02-10)
+
+- SOL: Use industry standard derivation path
+- SOL: Prevent sending empty memo
+- SOL: Update explorer links
+
+## 0.12.1 (2022-02-10)
+
+- FIO: Abstract unlockDate calculation into a `getUnlockDate` method
+
+## 0.12.0 (2022-02-08)
+
+- Add Solana (SOL)
+
 ## 0.11.11 (2022-02-02)
 
 - ZEC: Fix send amount

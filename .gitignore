@@ -1,9 +1,11 @@
 # Build output:
-.nyc_output
-/build
-/coverage
-/intermediate
-/lib
+/.nyc_output/
+/android/.gradle
+/android/*.jar
+/android/src/main/assets/edge-currency-accountbased/
+/cli/.storage/
+/dist/
+/scripts/cosmos-ts-protos/tmp
 
 # Package managers:
 node_modules/
@@ -11,9 +13,10 @@ npm-debug.log
 package-lock.json
 yarn-error.log
 stats.json
+testConfig.json
+results.json
 
 # Editors:
 .DS_Store
 .idea/
 .vscode/
-.vscode/settings.json

@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "noEmit": true,
+
+    "esModuleInterop": true,
+    "module": "es2020",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "target": "es2015",
+    "skipLibCheck": true,
+
+    "strict": true,
+    "types": []
+  },
+  "exclude": ["lib", "bin", "scripts/cosmos-ts-protos/tmp"]
+}
